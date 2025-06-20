@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
+import 'package:glow_street/app/modules/community/views/community_screen.dart';
 import 'package:glow_street/app/modules/home/views/home_screen.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 
@@ -20,7 +21,7 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
     const HomeScreen(),
     const SignInScreen(), // Replace with other screens as needed
     const SignInScreen(),
-    const SignInScreen(),
+    const CommunityScreen(),
     const SignInScreen(),
   ];
 
@@ -65,9 +66,9 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
               ),
               _buildNavItem(
                 index: 3,
-                selectedIcon: Icons.person,
-                unselectedIcon: Icons.person_outline,
-                label: "Profile",
+                selectedIcon: Icons.notifications,
+                unselectedIcon: Icons.notifications_none_outlined,
+                label: "Alert",
               ),
                _buildNavItem(
                 index: 4,

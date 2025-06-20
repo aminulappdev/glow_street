@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
@@ -11,11 +12,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isAnimated = false;
+  bool isSentAlert = false;
+  Timer? _holdTimer;
+
+  void _startHoldTimer() {
+    setState(() {
+      isAnimated = true; // Trigger animation
+    });
+    _holdTimer = Timer(Duration(seconds: 2), () {
+      isSentAlert = true;
+      print('Done');
+      setState(() {
+        isAnimated = false; // Revert animation after completion
+      });
+    });
+  }
+
+  void _cancelHoldTimer() {
+    _holdTimer?.cancel();
+    setState(() {
+      isAnimated = false; // Revert animation if released early
+    });
+  }
+
+  @override
+  void dispose() {
+    _cancelHoldTimer();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -35,24 +66,88 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             heightBox30,
-            Container(
-              height: 37.h,
-              width: 238.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: Color(0xffF4F4F4),
-                border: Border.all(color: Color(0xffE6E6E6)),
-              ),
-              child: Center(
-                child: Text(
-                  'Press volume up to activate SOS',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
+            isSentAlert == false
+                ? Container(
+                  height: 37.h,
+                  width: 238.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Color(0xffF4F4F4),
+                    border: Border.all(color: Color(0xffE6E6E6)),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Press volume up to activate SOS',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                )
+                : Container(
+                  height: 76.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    border: Border.all(color: Color(0xffE6E6E6), width: 0.5),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              'status',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            heightBox4,
+                            Container(
+                              height: 27.h,
+                              width: 69,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Color(0xffFFECF0),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.notifications,
+                                    color: Color(0xffDC143C),
+                                  ),
+                                  Text(
+                                    'Alert',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xffDC143C),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'SOS Active',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Color(0xffDC143C),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
+
             heightBox12,
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -77,10 +172,47 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: 10,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.all(4.0),
+                    padding: const EdgeInsets.all(6.0),
                     child: Column(
                       children: [
-                        CircleAvatar(radius: 23.r),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              height: 48,
+                              width: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey,
+                                border:
+                                    isSentAlert == false
+                                        ? Border.all(
+                                          width: 0,
+                                          color: Colors.transparent,
+                                        )
+                                        : Border.all(
+                                          color: Color(0xff32CD32),
+                                          width: 2,
+                                        ),
+                              ),
+                            ),
+                            isSentAlert == true
+                                ? Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: CircleAvatar(
+                                    radius: 10,
+                                    backgroundColor: Color(0xff32CD32),
+                                    child: Icon(
+                                      Icons.check,
+                                      size: 10,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
+                                : Container(),
+                          ],
+                        ),
                         heightBox5,
                         Text(
                           'Father',
@@ -97,57 +229,98 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             heightBox12,
-            Container(
-              height: 280.h,
-              width: 280.w,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [Color(0xffEF4444), Color(0xffEC4899)],
+            GestureDetector(
+              onLongPressStart: (_) {
+                _startHoldTimer();
+              },
+              onLongPressEnd: (_) {
+                _cancelHoldTimer();
+              },
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                transform:
+                    isAnimated
+                        ? Matrix4.diagonal3Values(1.05, 1.05, 1)
+                        : Matrix4.identity(),
+                height: 280.h,
+                width: 280.w,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0xffEF4444), Color(0xffEC4899)],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color.fromARGB(255, 240, 239, 239),
+                    width: 12,
+                  ),
+                  boxShadow: [
+                    isSentAlert == true
+                        ? BoxShadow(
+                          color: Color(0xffEF4444).withOpacity(0.5),
+                          blurRadius: 30,
+                          spreadRadius: 5,
+                          offset: Offset(0, 10),
+                        )
+                        : BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                          offset: Offset(0, 10),
+                        ),
+                  ],
                 ),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Color.fromARGB(255, 240, 239, 239),
-                  width: 12,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 190.h,
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'Hold to Send SOS Alert',
+                        style: TextStyle(fontSize: 25.sp, color: Colors.white),
+                      ),
+                    ),
+                    Text(
+                      'EMERGENCY',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2), // Shadow color
-                    blurRadius: 20, // How soft the shadow is
-                    spreadRadius: 2, // How wide the shadow spreads
-                    offset: Offset(0, 10), // Position of the shadow
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 200.h,
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      'Hold to Send SOS Alert',
-                      style: TextStyle(fontSize: 25.sp, color: Colors.white),
-                    ),
-                  ),
-
-                  Text(
-                    'EMERGENCY',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
               ),
             ),
             heightBox30,
-            Text(
-              'Press and hold activate emergency alert',
-              style: TextStyle(fontSize: 16.sp),
-            ),
+            isSentAlert == false
+                ? Text(
+                  'Press and hold activate emergency alert',
+                  style: TextStyle(fontSize: 16.sp),
+                )
+                : Container(
+                  height: 42.h,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xff32CD32).withOpacity(0.12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shield, color: Color(0xff32CD32)),
+                      Text(
+                        'I am Safe - Confirm',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff32CD32),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
           ],
         ),
       ),
