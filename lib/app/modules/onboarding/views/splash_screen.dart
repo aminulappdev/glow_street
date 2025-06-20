@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:glow_street/app/utils/assets_path.dart';
-import 'package:glow_street/app/utils/responsive_size.dart';
+import 'package:get/get.dart';
+import 'package:glow_street/app/modules/authentication/views/auth_screen.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,14 +14,14 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // _movetoNewScreen();
+     _movetoNewScreen();
     super.initState();
   }
 
-  // Future<void> _movetoNewScreen() async {
-  //   await Future.delayed(const Duration(seconds: 3));
-  //   print('done');
-  // }
+  Future<void> _movetoNewScreen() async {
+    await Future.delayed(const Duration(seconds: 3));
+    Get.to(AuthScreen());
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -41,19 +41,21 @@ class GlowStreet extends StatelessWidget {
 
 InputDecorationTheme inputDecoration() {
   return InputDecorationTheme(
-    hintStyle: const TextStyle(fontWeight: FontWeight.w300),
+    hintStyle: const TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
+
     fillColor: Colors.transparent,
     filled: true,
     border: inputBorder(),
     enabledBorder: inputBorder(),
     focusedBorder: inputBorder(),
     errorBorder: inputBorder(),
+    contentPadding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
   );
 }
 
 OutlineInputBorder inputBorder() {
   return OutlineInputBorder(
     borderSide: BorderSide(color: const Color(0xffCACACA), width: 1),
-    borderRadius: BorderRadius.circular(14),
+    borderRadius: BorderRadius.circular(10),
   );
 }
