@@ -4,7 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomElevatedButton extends StatelessWidget {
   final String title;
   final VoidCallback? onPressed;
-  const CustomElevatedButton({super.key, required this.title, this.onPressed});
+  final bool isDanger;
+  const CustomElevatedButton({
+    super.key,
+    required this.title,
+    this.onPressed,
+    this.isDanger = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +20,20 @@ class CustomElevatedButton extends StatelessWidget {
         height: 46.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xff0501FF), Color(0xff4E4CBC)],
-          ),
+          gradient:
+              isDanger
+                  ? LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+
+                    colors: [Color(0xffFF3356), Color(0xffFF3356)],
+                  )
+                  : LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+
+                    colors: [Color(0xff4E4CBC), Color(0xff0501FF)],
+                  ),
 
           borderRadius: BorderRadius.circular(12.r),
         ),

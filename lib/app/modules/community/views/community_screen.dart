@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:glow_street/app/modules/community/views/alert_details_screen.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -86,7 +89,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                   ],
                                 ),
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Get.to(AlertDetailsScreen());
+                                  },
                                   child: Container(
                                     height: 24,
                                     width: 24,

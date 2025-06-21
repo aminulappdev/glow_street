@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/app/modules/community/views/community_screen.dart';
+import 'package:glow_street/app/modules/contact/views/contact_screen.dart';
 import 'package:glow_street/app/modules/home/views/home_screen.dart';
+import 'package:glow_street/app/modules/profile/views/profile_screen.dart';
+import 'package:glow_street/app/modules/safezone/views/safeZone_screen.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 
 
@@ -19,10 +22,10 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
   // List of screens for navigation
   List<Widget> screens = [
     const HomeScreen(),
-    const SignInScreen(), // Replace with other screens as needed
-    const SignInScreen(),
+    const SafezoneScreen(), // Replace with other screens as needed
+    const ContactScreen(),
     const CommunityScreen(),
-    const SignInScreen(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -60,9 +63,9 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
               ),
               _buildNavItem(
                 index: 2,
-                selectedIcon: Icons.list_alt,
-                unselectedIcon: Icons.list_alt_outlined,
-                label: "List",
+                selectedIcon: Icons.call,
+                unselectedIcon: Icons.call,
+                label: "contact",
               ),
               _buildNavItem(
                 index: 3,

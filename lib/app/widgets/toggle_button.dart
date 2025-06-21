@@ -37,10 +37,13 @@ class _ToggleButtonState extends State<ToggleButton> {
     return GestureDetector(
       onTap: _toggle,
       child: Container(
-        width: 49.w,
-        height: 28.h,
+        width: 36.w,
+        height: 21.h,
         decoration: BoxDecoration(
-          color: _isToggled ? AppColors.iconButtonThemeColor : Colors.grey, // Grey when unselected
+          color:
+              _isToggled
+                  ? Color(0xff65C466)
+                  : Colors.grey, // Grey when unselected
           borderRadius: BorderRadius.circular(100),
         ),
         child: Stack(
@@ -48,12 +51,9 @@ class _ToggleButtonState extends State<ToggleButton> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              left: _isToggled ? 24 : 2,
-              top: 2,
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 12.r,
-              ),
+              left: _isToggled ? 15 : 2,
+              top: 1,
+              child: CircleAvatar(backgroundColor: Colors.white, radius: 10.r),
             ),
           ],
         ),

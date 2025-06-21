@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:glow_street/app/utils/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget {
@@ -20,12 +19,8 @@ class CustomAppBar extends StatelessWidget {
           onTap: () {
             isBack == true ? Navigator.pop(context) : null;
           },
-          child: CircleAvatar(
-            backgroundColor: AppColors.iconButtonThemeColor,
-            radius: 24.r,
-            child: Icon(
-              Icons.arrow_back,color: Colors.white,
-            ),
+          child: Icon(
+            Icons.arrow_back,color: Colors.black,
           ),
         ),
         
@@ -38,7 +33,8 @@ class CustomAppBar extends StatelessWidget {
           ),
         
         ),
-        Container(width: 36.w,)
+
+        Container(width: 150.w,)
       ],
     );
   }
