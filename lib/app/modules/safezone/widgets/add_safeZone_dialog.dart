@@ -142,7 +142,7 @@ class _AddSafeZoneAlertDialogState extends State<AddSafeZoneAlertDialog> {
               ),
 
               heightBox20,
-              CustomElevatedButton(title: 'Save Change', onPressed: () {}),
+              CustomElevatedButton(title: 'Start Run', onPressed: () {}),
               heightBox8,
               CustomDisableElevatedButton(title: 'Cancel'),
             ],

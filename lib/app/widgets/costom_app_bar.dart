@@ -6,12 +6,13 @@ class CustomAppBar extends StatelessWidget {
   final String name;
   final bool isBack;
   const CustomAppBar({
-    super.key, required this.name,  this.isBack = true,
+    super.key,
+    required this.name,
+    this.isBack = true,
   });
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -20,10 +21,10 @@ class CustomAppBar extends StatelessWidget {
             isBack == true ? Navigator.pop(context) : null;
           },
           child: Icon(
-            Icons.arrow_back,color: Colors.black,
+            Icons.arrow_back,
+            color: Colors.black,
           ),
         ),
-        
         Text(
           name,
           style: GoogleFonts.poppins(
@@ -31,10 +32,10 @@ class CustomAppBar extends StatelessWidget {
             color: Color.fromARGB(255, 0, 0, 0),
             fontWeight: FontWeight.w500,
           ),
-        
         ),
-
-        Container(width: 150.w,)
+        Container(
+          width: 130.w,
+        )
       ],
     );
   }

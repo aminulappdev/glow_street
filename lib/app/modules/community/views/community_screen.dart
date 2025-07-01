@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:glow_street/app/modules/community/views/alert_details_screen.dart';
+import 'package:glow_street/app/modules/community/widgets/post_alert_dialog_widget.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -28,7 +29,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   'Community Alerts Nearby',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                Icon(Icons.add, color: Color(0xff0501FF), size: 26),
+                InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const CommunityAlertDialog(),
+                      );
+                    },
+                    child: Icon(Icons.add, color: Color(0xff0501FF), size: 26)),
               ],
             ),
             heightBox16,
@@ -75,7 +83,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
-
                                         Text(
                                           'Md Aminul',
                                           style: TextStyle(

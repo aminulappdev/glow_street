@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:glow_street/app/modules/authentication/views/auth_screen.dart';
 import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/modules/onboarding/views/splash_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +23,7 @@ class GlowStreet extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return GetMaterialApp(
+        return GetMaterialApp( 
           // initialBinding: ControllerBinder(),
           debugShowCheckedModeBanner: false,
           title: 'glow-street',
@@ -33,7 +35,7 @@ class GlowStreet extends StatelessWidget {
             fontFamily: 'Poppins',
             textTheme: TextTheme(),
           ),
-          home: MainButtonNavbarScreen(),
+          home: SplashScreen(),
         );
       },
     );

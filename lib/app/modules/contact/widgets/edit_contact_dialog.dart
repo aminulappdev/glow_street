@@ -7,14 +7,14 @@ import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
 import 'package:glow_street/app/widgets/image_picker.dart';
 
-class AddContactAlertDialog extends StatefulWidget {
-  const AddContactAlertDialog({super.key});
+class EditContactAlertDialog extends StatefulWidget {
+  const EditContactAlertDialog({super.key});
 
   @override
-  State<AddContactAlertDialog> createState() => _AddContactAlertDialogState();
+  State<EditContactAlertDialog> createState() => _EditContactAlertDialogState();
 }
 
-class _AddContactAlertDialogState extends State<AddContactAlertDialog> {
+class _EditContactAlertDialogState extends State<EditContactAlertDialog> {
   final _formKey = GlobalKey<FormState>();
   final _alertTypeController = TextEditingController();
   final _locationController = TextEditingController();
@@ -140,7 +140,7 @@ class _AddContactAlertDialogState extends State<AddContactAlertDialog> {
               ),
 
               heightBox20,
-              CustomElevatedButton(title: 'Save', onPressed: () {}),
+              CustomElevatedButton(title: 'Save Changes', onPressed: () {}),
               heightBox8,
               CustomDisableElevatedButton(title: 'Cancel'),
             ],

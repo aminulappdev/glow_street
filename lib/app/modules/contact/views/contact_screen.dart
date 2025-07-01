@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:glow_street/app/modules/community/views/alert_details_screen.dart';
 import 'package:glow_street/app/modules/contact/widgets/add_contact_dialog.dart'
     show AddContactAlertDialog;
+import 'package:glow_street/app/modules/contact/widgets/edit_contact_dialog.dart';
 import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/delete_alert_dialog.dart';
@@ -41,11 +42,10 @@ class _ContactScreenState extends State<ContactScreen> {
                   ),
                 ),
                 InkWell(
-                  onTap:
-                      () => showDialog(
-                        context: context,
-                        builder: (context) => const AddContactAlertDialog(),
-                      ),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => const AddContactAlertDialog(),
+                  ),
                   child: Icon(
                     Icons.add,
                     color: const Color(0xff0501FF),
@@ -97,7 +97,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                       ),
                                     ),
                                     Text(
-                                      'Md Aminul',
+                                      '0197545122',
                                       style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w300,
@@ -113,7 +113,8 @@ class _ContactScreenState extends State<ContactScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Get.to(() => const AlertDetailsScreen());
+                                    Get.to(
+                                        () => const AddContactAlertDialog());
                                   },
                                   child: Icon(
                                     Icons.edit,
@@ -126,9 +127,8 @@ class _ContactScreenState extends State<ContactScreen> {
                                   onTap: () {
                                     showDialog(
                                       context: context,
-                                      builder:
-                                          (context) =>
-                                              const DeleteAlertDialog(),
+                                      builder: (context) =>
+                                          const DeleteAlertDialog(),
                                     );
                                   },
                                   child: Icon(

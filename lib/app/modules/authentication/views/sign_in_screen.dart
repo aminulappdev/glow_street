@@ -5,7 +5,9 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:glow_street/app/modules/authentication/views/forgot_password_screen.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_up_screen.dart';
 import 'package:glow_street/app/modules/authentication/widgets/custom_arrow_widget.dart';
+import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
+import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -109,7 +111,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   heightBox16,
-                  CustomDisableElevatedButton(title: 'Login'),
+                  CustomElevatedButton(title: 'Login', onPressed: () {
+                    Get.to(MainButtonNavbarScreen());
+                  },),
                 ],
               ),
             ),

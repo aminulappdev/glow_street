@@ -57,9 +57,9 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
               ),
               _buildNavItem(
                 index: 1,
-                selectedIcon: Icons.shopping_cart,
-                unselectedIcon: Icons.shopping_cart_outlined,
-                label: "Cart",
+                selectedIcon: Icons.share_location,
+                unselectedIcon: Icons.share_location_outlined ,
+                label: "Geo",
               ),
               _buildNavItem(
                 index: 2,

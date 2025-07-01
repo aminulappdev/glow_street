@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/app/modules/authentication/widgets/custom_arrow_widget.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
-
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -152,7 +154,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   heightBox8,
 
                   heightBox16,
-                  CustomElevatedButton(title: 'Create Account', onPressed: () {}),
+                  CustomElevatedButton(title: 'Create Account', onPressed: () {
+                    Get.to(SignInScreen());
+                  }),
                 ],
               ),
             ),
