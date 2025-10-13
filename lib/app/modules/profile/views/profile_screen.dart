@@ -12,7 +12,7 @@ import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatefulWidget { 
   const ProfileScreen({super.key});
 
   @override
@@ -75,14 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                       // Edit and delete icons
-                      InkWell(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.edit_square,
-                          size: 22.sp,
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
+                     
                     ],
                   ),
                 ),

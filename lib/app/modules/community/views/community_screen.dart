@@ -17,7 +17,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: Padding( 
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -55,7 +55,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Container(
-                      height: 132.h,
+                      
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),

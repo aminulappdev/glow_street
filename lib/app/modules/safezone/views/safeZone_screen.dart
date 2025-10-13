@@ -70,7 +70,7 @@ class _SafezoneScreenState extends State<SafezoneScreen> {
                       color: Colors.white,
                       elevation: 1,
                       child: Container(
-                        height: 120.h,
+                        // height: 130.h,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
@@ -80,8 +80,10 @@ class _SafezoneScreenState extends State<SafezoneScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              heightBox12,
+                              
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -156,9 +158,8 @@ class _SafezoneScreenState extends State<SafezoneScreen> {
                                     onTap: () {
                                       showDialog(
                                         context: context,
-                                        builder:
-                                            (context) =>
-                                                EditSafeZoneAlertDialog(),
+                                        builder: (context) =>
+                                            EditSafeZoneAlertDialog(),
                                       );
                                     },
                                     child: Row(
@@ -184,8 +185,8 @@ class _SafezoneScreenState extends State<SafezoneScreen> {
                                     onTap: () {
                                       showDialog(
                                         context: context,
-                                        builder:
-                                            (context) => DeleteAlertDialog(),
+                                        builder: (context) =>
+                                            DeleteAlertDialog(),
                                       );
                                     },
                                     child: Row(

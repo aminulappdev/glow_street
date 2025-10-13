@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
-
+ 
 class CommunityAlertDialog extends StatefulWidget {
   const CommunityAlertDialog({super.key});
 
