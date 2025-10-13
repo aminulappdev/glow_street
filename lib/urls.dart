@@ -21,6 +21,10 @@ class Urls {
   static const String notificationUrl = '$_baseUrl/notifications';
   static const String contentByParam = '$_baseUrl/contents';
 
+  static String categoryById(String id) {
+    return '$_baseUrl/categories/$id';
+  }
+
   static String productDetailsById(
     String id,
   ) {
