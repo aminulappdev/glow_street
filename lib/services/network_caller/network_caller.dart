@@ -1,354 +1,339 @@
-// import 'dart:convert';
-// import 'package:expriy_deals/services/network_caller/error_message_model.dart';
-// import 'package:expriy_deals/services/network_caller/network_response.dart';
-// import 'package:http/http.dart';
-// import 'package:logger/logger.dart';
+// ignore_for_file: depend_on_referenced_packages, avoid_print
 
+import 'dart:convert';
+import 'dart:io';
+import 'package:glow_street/services/network_caller/error_message_model.dart';
+import 'package:glow_street/services/network_caller/network_response.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:logger/logger.dart';
+import 'package:mime/mime.dart';
 
-// class NetworkCaller {
-//   final Logger _logger = Logger();
+class NetworkCaller {
+  final Logger _logger = Logger();
 
-//   Future<NetworkResponse> getRequest(String url,
-//       {Map<String, dynamic>? queryParams, String? accesToken}) async {
-//     try {
-//       _logRequest(url);
+  // GET request
+  Future<NetworkResponse> getRequest(
+    String url, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    String? accessToken,
+    String? token,
+  }) async {
+    return _handleRequest(
+      method: 'GET',
+      url: url,
+      queryParams: queryParams,
+      headers: headers,
+      accessToken: accessToken,
+      token: token,
+    );
+  }
 
-//       if (queryParams != null) {
-//         url += '?';
-//         for (String param in queryParams.keys) {
-//           url += '$param=${queryParams[param]}&';
-//         }
-//       }
-//       Uri uri = Uri.parse(url);
-//       Map<String, String> headers = {
-//         'content-type': 'application-json',
-//       };
+  // POST request
+  Future<NetworkResponse> postRequest(
+    String url, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    Map<String, dynamic>? body,
+    File? image,
+    List<File>? images,
+    File? cover,
+    String? keyNameImage,
+    String? keyNameCover,
+    String? accessToken,
+    String? token,
+  }) async {
+    return _handleRequest(
+      method: 'POST',
+      url: url,
+      queryParams: queryParams,
+      headers: headers,
+      body: body,
+      image: image,
+      images: images,
+      cover: cover,
+      keyNameImage: keyNameImage,
+      keyNameCover: keyNameCover,
+      accessToken: accessToken,
+      token: token,
+    );
+  }
 
-//       if (accesToken != null) {
-//         headers['Authorization'] = 'Bearer $accesToken';
-//       }
+  // PATCH request
+  Future<NetworkResponse> patchRequest(
+    String url, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    Map<String, dynamic>? body,
+    File? image,
+    List<File>? images,
+    File? cover,
+    String? keyNameImage,
+    String? keyNameCover,
+    String? accessToken,
+    String? token,
+  }) async {
+    return _handleRequest(
+      method: 'PATCH',
+      url: url,
+      queryParams: queryParams,
+      headers: headers,
+      body: body,
+      image: image,
+      images: images,
+      cover: cover,
+      keyNameImage: keyNameImage,
+      keyNameCover: keyNameCover,
+      accessToken: accessToken,
+      token: token,
+    );
+  }
 
-//       var response = await get(uri, headers: headers);
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-//       if (response.statusCode == 200) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         final debugMessage = jsonDecode(response.body);
-//         ErrorMessageModel errorMessageModel =
-//             ErrorMessageModel.fromJson(debugMessage);
-//         return NetworkResponse(
-//             isSuccess: false,
-//             statusCode: response.statusCode,
-//             errorMessage: errorMessageModel.message ?? 'Wrong');
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//           isSuccess: false, statusCode: -1, errorMessage: e.toString());
-//     }
-//   }
+  // PUT request
+  Future<NetworkResponse> putRequest(
+    String url, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    Map<String, dynamic>? body,
+    File? image,
+    List<File>? images,
+    File? cover,
+    String? keyNameImage,
+    String? keyNameCover,
+    String? accessToken,
+    String? token,
+  }) async {
+    return _handleRequest(
+      method: 'PUT',
+      url: url,
+      queryParams: queryParams,
+      headers: headers,
+      body: body,
+      image: image,
+      images: images,
+      cover: cover,
+      keyNameImage: keyNameImage,
+      keyNameCover: keyNameCover,
+      accessToken: accessToken,
+      token: token,
+    );
+  }
 
-//   Future<NetworkResponse> patchRequest(String url,
-//       {Map<String, dynamic>? queryParams,
-//       String? accesToken,
-//       Map<String, dynamic>? body}) async {
-//     try {
-//       _logRequest(url);
+  // DELETE request
+  Future<NetworkResponse> deleteRequest(
+    String url, {
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    String? accessToken,
+    String? token,
+  }) async {
+    return _handleRequest(
+      method: 'DELETE',
+      url: url,
+      queryParams: queryParams,
+      headers: headers,
+      accessToken: accessToken,
+      token: token,
+    );
+  }
 
-//       if (queryParams != null && queryParams.isNotEmpty) {
-//         url += '?';
-//         for (String param in queryParams.keys) {
-//           url += '$param=${queryParams[param]}&';
-//         }
-//         url = url.substring(0, url.length - 1); // remove last "&"
-//       }
+  String _cleanPath(String path) {
+    return path.startsWith('file://') ? path.replaceFirst('file://', '') : path;
+  }
 
-//       Uri uri = Uri.parse(url);
+  void _logRequest(String url, Map<String, String> headers, [dynamic body]) {
+    _logger.i('URL => $url\nHeaders => $headers\nBody => $body');
+  }
 
-//       // 🔧 Only set content-type if body is not null
-//       Map<String, String> headers = {};
-//       if (body != null) {
-//         headers['content-type'] = 'application/json';
-//       }
+  void _logResponse(
+    String url,
+    int statusCode,
+    Map<String, String>? headers,
+    String body, [
+    String? errorMessage,
+  ]) {
+    if (errorMessage != null) {
+      _logger.e('URL => $url\nError => $errorMessage');
+    } else {
+      _logger.i(
+        'URL => $url\nStatusCode => $statusCode\nHeaders => $headers\nBody => $body',
+      );
+    }
+  }
 
-//       if (accesToken != null) {
-//         headers['Authorization'] = 'Berarer $accesToken';
-//       }
+  Future<NetworkResponse> _handleRequest({
+    required String method,
+    required String url,
+    Map<String, dynamic>? queryParams,
+    Map<String, String>? headers,
+    dynamic body,
+    File? image,
+    List<File>? images,
+    File? cover,
+    String? keyNameImage,
+    String? keyNameCover,
+    String? accessToken,
+    String? token,
+  }) async {
+    try {
+      // Append query parameters if provided
+      if (queryParams != null && queryParams.isNotEmpty) {
+        url +=
+            '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
+      }
 
-//       _logRequest(url, headers, body);
+      Uri uri = Uri.parse(url);
+      Map<String, String> defaultHeaders = {
+        'content-type': 'application/json',
+        ...?headers, // Merge custom headers
+      };
 
-//       // 🔧 Send encoded body only if body is not null
-//       final response = await patch(
-//         uri,
-//         headers: headers,
-//         body: body != null ? jsonEncode(body) : null,
-//       );
+      // Add accessToken to headers if provided
+      if (token != null && token.isNotEmpty) {
+        defaultHeaders['token'] = token;
+      } else if (accessToken != null && accessToken.isNotEmpty) {
+        defaultHeaders['Authorization'] = 'Bearer $accessToken';
+      }
 
-//       _logResponse(url, response.statusCode, response.headers, response.body);
+      http.Response? response;
+      var request = image != null || images != null || cover != null
+          ? http.MultipartRequest(method, uri)
+          : null;
 
-//       if (response.statusCode == 200) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         final debugMessage = jsonDecode(response.body);
-//         ErrorMessageModel errorMessageModel =
-//             ErrorMessageModel.fromJson(debugMessage);
-//         return NetworkResponse(
-//           isSuccess: false,
-//           statusCode: response.statusCode,
-//           errorMessage: errorMessageModel.message ?? 'Something went wrong',
-//         );
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//         isSuccess: false,
-//         statusCode: -1,
-//         errorMessage: e.toString(),
-//       );
-//     }
-//   }
+      if (request != null) {
+        // Handle multipart request for file uploads
+        request.headers.addAll(defaultHeaders);
+        if (body != null) {
+          request.fields['payload'] = jsonEncode(body);
+        }
 
-//   Future<NetworkResponse> postRequest(String url, Map<String, dynamic>? body,
-//       {String? accesToken}) async {
-//     try {
-//       Uri uri = Uri.parse(url);
+        // Add single image
+        if (image != null) {
+          String imagePath = _cleanPath(image.path);
+          print('Adding image: $imagePath');
+          if (await image.exists()) {
+            String? mimeType = lookupMimeType(imagePath) ?? 'image/jpeg';
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                keyNameImage ?? 'image',
+                imagePath,
+                contentType: MediaType.parse(mimeType),
+              ),
+            );
+          } else {
+            print('Image file does not exist: $imagePath');
+            return NetworkResponse(
+              isSuccess: false,
+              statusCode: -1,
+              errorMessage: 'Image file does not exist: $imagePath',
+            );
+          }
+        }
 
-//       Map<String, String> headers = {
-//         'content-type': 'application/json',
-//       };
+        // Add multiple images
+        if (images != null && images.isNotEmpty) {
+          for (File img in images) {
+            String imagePath = _cleanPath(img.path);
+            print('Adding multiple images: $imagePath');
+            if (await img.exists()) {
+              String? mimeType = lookupMimeType(imagePath) ?? 'image/jpeg';
+              request.files.add(
+                await http.MultipartFile.fromPath(
+                  keyNameImage ?? 'images',
+                  imagePath,
+                  contentType: MediaType.parse(mimeType),
+                ),
+              );
+            } else {
+              print('Image file does not exist: $imagePath');
+            }
+          }
+        }
 
-//       if (accesToken != null) {
-//         headers['Authorization'] = 'Berarer $accesToken';
-//       }
+        // Add cover image
+        if (cover != null) {
+          String coverPath = _cleanPath(cover.path);
+          print('Adding cover: $coverPath');
+          if (await cover.exists()) {
+            String? mimeType = lookupMimeType(coverPath) ?? 'image/jpeg';
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                keyNameCover ?? 'cover',
+                coverPath,
+                contentType: MediaType.parse(mimeType),
+              ),
+            );
+          } else {
+            print('Cover file does not exist: $coverPath');
+          }
+        }
 
-//       _logRequest(url, headers, body);
-//       var response = await post(uri, headers: headers, body: jsonEncode(body));
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-//       if (response.statusCode == 200 || response.statusCode == 201) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         final debugMessage = jsonDecode(response.body);
-//         ErrorMessageModel errorMessageModel =
-//             ErrorMessageModel.fromJson(debugMessage);
-//         return NetworkResponse(
-//             isSuccess: false,
-//             statusCode: response.statusCode,
-//             errorMessage: errorMessageModel.message ?? 'Wrong');
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//           isSuccess: false, statusCode: -1, errorMessage: e.toString());
-//     }
-//   }
+        _logRequest(url, defaultHeaders, body);
+        print('Request files: ${request.files}');
+        var streamedResponse = await request.send();
+        response = await http.Response.fromStream(streamedResponse);
+      } else {
+        // Handle regular HTTP request
+        _logRequest(url, defaultHeaders, body);
+        switch (method) {
+          case 'GET':
+            response = await http.get(uri, headers: defaultHeaders);
+            break;
+          case 'POST':
+            response = await http.post(
+              uri,
+              headers: defaultHeaders,
+              body: body != null ? jsonEncode(body) : null,
+            );
+            break;
+          case 'PATCH':
+            response = await http.patch(
+              uri,
+              headers: defaultHeaders,
+              body: body != null ? jsonEncode(body) : null,
+            );
+            break;
+          case 'PUT':
+            response = await http.put(
+              uri,
+              headers: defaultHeaders,
+              body: body != null ? jsonEncode(body) : null,
+            );
+            break;
+          case 'DELETE':
+            response = await http.delete(uri, headers: defaultHeaders);
+            break;
+        }
+      }
 
-//   Future<NetworkResponse> putRequest(String url, Map<String, dynamic>? body,
-//       {String? accesToken}) async {
-//     try {
-//       Uri uri = Uri.parse(url);
+      _logResponse(url, response!.statusCode, response.headers, response.body);
 
-//       Map<String, String> headers = {
-//         'content-type': 'application/json',
-//       };
-
-//       if (accesToken != null) {
-//         headers['Authorization'] = accesToken;
-//       }
-
-//       _logRequest(url, headers, body);
-//       var response = await put(uri, headers: headers, body: jsonEncode(body));
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-//       if (response.statusCode == 200 || response.statusCode == 201) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         return NetworkResponse(
-//             isSuccess: false, statusCode: response.statusCode);
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//           isSuccess: false, statusCode: -1, errorMessage: e.toString());
-//     }
-//   }
-
-//   Future<NetworkResponse> deleteRequest(String url,
-//       {Map<String, dynamic>? queryParams, String? accesToken}) async {
-//     try {
-//       _logRequest(url);
-
-//       if (queryParams != null) {
-//         url += '?';
-//         for (String param in queryParams.keys) {
-//           url += '$param=${queryParams[param]}&';
-//         }
-//       }
-//       Uri uri = Uri.parse(url);
-//       Map<String, String> headers = {
-//         'content-type': 'application-json',
-//       };
-
-//       if (accesToken != null) {
-//         headers['Authorization'] ='Bearer $accesToken';
-//       }
-
-//       var response = await delete(uri, headers: headers);
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-//       if (response.statusCode == 200) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         return NetworkResponse(
-//             isSuccess: false, statusCode: response.statusCode);
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//           isSuccess: false, statusCode: -1, errorMessage: e.toString());
-//     }
-//   }
-
-//   Future<NetworkResponse> patchRequestWithToken(String url,
-//       {Map<String, dynamic>? queryParams,
-//       String? accesToken,
-//       Map<String, dynamic>? body}) async {
-//     try {
-//       _logRequest(url);
-
-//       if (queryParams != null && queryParams.isNotEmpty) {
-//         url += '?';
-//         for (String param in queryParams.keys) {
-//           url += '$param=${queryParams[param]}&';
-//         }
-//         url = url.substring(0, url.length - 1); // remove last "&"
-//       }
-
-//       Uri uri = Uri.parse(url);
-
-//       // 🔧 Only set content-type if body is not null
-//       Map<String, String> headers = {};
-//       if (body != null) {
-//         headers['content-type'] = 'application/json';
-//       }
-
-//       if (accesToken != null) {
-//         headers['token'] = accesToken;
-//       }
-
-//       _logRequest(url, headers, body);
-
-//       // 🔧 Send encoded body only if body is not null
-//       final response = await patch(
-//         uri,
-//         headers: headers,
-//         body: body != null ? jsonEncode(body) : null,
-//       );
-
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-
-//       if (response.statusCode == 200) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         final debugMessage = jsonDecode(response.body);
-//         ErrorMessageModel errorMessageModel =
-//             ErrorMessageModel.fromJson(debugMessage);
-//         return NetworkResponse(
-//           isSuccess: false,
-//           statusCode: response.statusCode,
-//           errorMessage: errorMessageModel.message ?? 'Something went wrong',
-//         );
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//         isSuccess: false,
-//         statusCode: -1,
-//         errorMessage: e.toString(),
-//       );
-//     }
-//   }
-
-//   Future<NetworkResponse> postRequestWithToken(
-//       String url, Map<String, dynamic>? body,
-//       {String? accesToken}) async {
-//     try {
-//       Uri uri = Uri.parse(url);
-
-//       Map<String, String> headers = {
-//         'content-type': 'application/json',
-//       };
-
-//       if (accesToken != null) {
-//         headers['token'] = accesToken;
-//       }
-
-//       _logRequest(url, headers, body);
-//       var response = await post(uri, headers: headers, body: jsonEncode(body));
-//       _logResponse(url, response.statusCode, response.headers, response.body);
-//       if (response.statusCode == 200 || response.statusCode == 201) {
-//         final debugMessage = jsonDecode(response.body);
-//         return NetworkResponse(
-//           isSuccess: true,
-//           statusCode: response.statusCode,
-//           responseData: debugMessage,
-//         );
-//       } else {
-//         final debugMessage = jsonDecode(response.body);
-//         ErrorMessageModel errorMessageModel =
-//             ErrorMessageModel.fromJson(debugMessage);
-//         return NetworkResponse(
-//             isSuccess: false,
-//             statusCode: response.statusCode,
-//             errorMessage: errorMessageModel.message ?? 'Wrong');
-//       }
-//     } catch (e) {
-//       _logResponse(url, -1, null, '', e.toString());
-//       return NetworkResponse(
-//           isSuccess: false, statusCode: -1, errorMessage: e.toString());
-//     }
-//   }
-
-//   void _logRequest(String url,
-//       [Map<String, dynamic>? headers, Map<String, dynamic>? body]) {
-//     _logger.i('URL => $url\nHeaders => $headers\nBODY => $body');
-//   }
-
-//   void _logResponse(
-//       String url, int statusCode, Map<String, String>? headers, String body,
-//       [String? errorMessage]) {
-//     if (errorMessage != null) {
-//       _logger.e('URL => $url\Error Message => $errorMessage');
-//     } else {
-//       _logger.i(
-//           'URL => $url\nHeaders => $headers\nStatusCode => $statusCode \nBODY => $body');
-//     }
-//   }
-// }
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decodedResponse = jsonDecode(response.body);
+        return NetworkResponse(
+          isSuccess: true,
+          statusCode: response.statusCode,
+          responseData: decodedResponse,
+        );
+      } else {
+        final decodedResponse = jsonDecode(response.body);
+        ErrorMessageModel errorMessageModel = ErrorMessageModel.fromJson(
+          decodedResponse,
+        );
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: errorMessageModel.message ?? 'Something went wrong',
+        );
+      }
+    } catch (e) {
+      _logResponse(url, -1, null, '', e.toString());
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: -1,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+}

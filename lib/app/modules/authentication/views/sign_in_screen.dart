@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:glow_street/app/modules/authentication/controllers/sign_in_controller.dart';
 import 'package:glow_street/app/modules/authentication/views/forgot_password_screen.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_up_screen.dart';
 import 'package:glow_street/app/modules/authentication/widgets/custom_arrow_widget.dart';
 import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
-import 'package:glow_street/app/widgets/custom_disable_button.dart';
+import 'package:glow_street/app/widgets/show_snackBar_message.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -19,6 +19,14 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _obscureText = true;
+
+  bool _isLoading = false; // Add loading state
+
+  TextEditingController emailController = TextEditingController(text: 'aminulappdev@gmail.com');
+  TextEditingController passwordController = TextEditingController(text: 'Aminul@123');
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  SignInController signInController = SignInController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,37 +63,47 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   heightBox12,
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      if (value!.isEmpty) {
-                        return 'Enter your email';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(hintText: 'Email Address'),
-                  ),
-                  heightBox12,
-                  TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (String? value) {
-                      if (value!.isEmpty) {
-                        return 'Enter your password';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.grey,
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          controller: emailController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
+                              return 'Enter your email';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(hintText: 'Email Address'),
                         ),
-                        onPressed:
-                            () => setState(() => _obscureText = !_obscureText),
-                      ),
-                      hintText: '********',
+                        heightBox12,
+                        TextFormField(
+                          controller: passwordController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
+                              return 'Enter your password';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _obscureText = !_obscureText),
+                            ),
+                            hintText: '********',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   heightBox8,
@@ -111,9 +129,15 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   heightBox16,
-                  CustomElevatedButton(title: 'Login', onPressed: () {
-                    Get.to(MainButtonNavbarScreen());
-                  },),
+                  CustomElevatedButton(
+                    isLoading: _isLoading,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        signInFunction(context);
+                      }
+                    },
+                    title: 'Sign In',
+                  ),
                 ],
               ),
             ),
@@ -121,5 +145,31 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> signInFunction(BuildContext context) async {
+    setState(() {
+      _isLoading = true; // Set loading to true when API call starts
+    });
+
+    final bool isSuccess = await signInController.signIn(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    setState(() {
+      _isLoading = false; // Set loading to false when API call ends
+    });
+
+    if (isSuccess) {
+      showSnackBarMessage(context, 'Successfully done');
+      Get.offAll(() => MainButtonNavbarScreen());
+    } else {
+      showSnackBarMessage(
+        context,
+        signInController.errorMessage,
+        true,
+      );
+    }
   }
 }

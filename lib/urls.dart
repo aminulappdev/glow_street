@@ -1,47 +1,66 @@
 class Urls {
-  static const String _baseUrl = 'http://115.127.156.131:7000/api/v1';
-  // static const String _baseUrl = 'http://192.168.10.22:7000/api/v1';
-  static const String createUserUrl = '$_baseUrl/users';
-  static const String otpVerifyrUrl = '$_baseUrl/otp/verify-otp';
-  static const String signInUrl = '$_baseUrl/auth/login'; 
-  static const String forgotPasswordUrl = '$_baseUrl/auth/forgot-password';
-  static const String resendOTPUrl = '$_baseUrl/otp/resend-otp';
-  static const String resetPasswordUrl = '$_baseUrl/auth/reset-password';
-  static const String googleAuthUrl = '$_baseUrl/auth/google-login';
-  static const String getProfileUrl = '$_baseUrl/users/my-profile';
-  static const String updateProfileUrl = '$_baseUrl/users/update-my-profile';
+  // =========================================== Base ================================================ //
+  //static const String _baseUrl = 'http://10.10.10.17:5006/api/v1';
+  //static const String socketUrl = 'http://10.10.10.17:4000/';
+
+  static const String _baseUrl = 'http://103.186.20.117:6105/api/v1';
+  static const String socketUrl = 'http://74.118.168.203:4002/';
+
+  // =========================================== Common ============================================== //
+  static const String districtsUrl = '$_baseUrl/districts';
+  static const String districtUrl = '$_baseUrl/districts';
+  static const String schoolsUrl = '$_baseUrl/schools';
   static const String categoryUrl = '$_baseUrl/categories';
-  static const String productUrl = '$_baseUrl/products';
-  static const String ordertUrl = '$_baseUrl/orders';
-  static const String addToCartUrl = '$_baseUrl/add-to-card';
-  static const String myOrderUrl = '$_baseUrl/orders/my-orders';
-  static const String allShopsUrl = '$_baseUrl/shop';
-  static const String paymentUrl = '$_baseUrl/payments/checkout';
-  static const String changePasswordtUrl = '$_baseUrl/auth/change-password';
-  static const String notificationUrl = '$_baseUrl/notifications';
-  static const String contentByParam = '$_baseUrl/contents';
+  static const String profileUrl = '$_baseUrl/users/my-profile';
+  static const String notificationsUrl = '$_baseUrl/notifications';
+  static const String contentUrl = '$_baseUrl/legal';
 
-  static String categoryById(String id) {
-    return '$_baseUrl/categories/$id';
+  // =========================================== Authentication ====================================== //
+  static const String signUpUrl = '$_baseUrl/users';
+  static const String refreshTokenUrl = '$_baseUrl/auth/refresh-token';
+  static const String googleAuthUrl = '$_baseUrl/auth/social-login';
+  static const String otpVerifyUrl = '$_baseUrl/otp/verify-otp';
+  static const String signInUrl = '$_baseUrl/auth/login';
+  static const String forgotPasswordUrl = '$_baseUrl/auth/forgot-password';
+  static const String changePasswordUrl = '$_baseUrl/auth/change-password';
+  static const String deleteAccountUrl = '$_baseUrl/auth/change-password';
+  static const String resetPasswordUrl =
+      '$_baseUrl/auth/reset-password';
+
+  // =========================================== Profile Block ======================================= //
+  static const String updateProfileUrl = '$_baseUrl/teachers/profile';
+  static const String updateProfilImageUrl =
+      '$_baseUrl/teachers/profile/change-image';
+
+  // =========================================== Home Block ========================================== //
+  static const String assetsUrl = '$_baseUrl/assets';
+  static const String myAssetsUrl = '$_baseUrl/assets/my-posted';
+  static const String createAssetUrl = '$_baseUrl/assets';
+  static const String myGrabbedUrl = '$_baseUrl/assets/my-grabbed';
+  static String assetsDetailsById(String id) {
+    return '$_baseUrl/assets/$id';
   }
 
-  static String productDetailsById(
-    String id,
-  ) {
-    return '$_baseUrl/products/$id';
+  static String deleteNotificationById(String id) {
+    return '$_baseUrl/notifications/$id';
   }
 
-  
+  // =========================================== Chat Block =========================================== //
+  static const String allFriendsChatnUrl = '$_baseUrl/chats/my';
+  static const String lastGrappedUrl = '$_baseUrl/assets/last-grabbed';
+  static const String createChatUrl = '$_baseUrl/chats';
+  static const String imageDecodeUrl = '$_baseUrl/upload-files';
+  static const String messageSeenUrl = '$_baseUrl/upload-files';
 
-  static String confirmedPaymentUrlsById(
-    String id,
-  ) {
-    return '$_baseUrl/payments/order/$id';
+  static String messagesById(String id) {
+    return '$_baseUrl/messages/$id';
   }
 
-  static String deleteCartById(
-    String id,
-  ) {
-    return '$_baseUrl/add-to-card/$id';
+  static String messagesSeenById(String id) {
+    return '$_baseUrl/messages/seen/$id';
+  }
+
+  static String grabbedById(String id) {
+    return '$_baseUrl/assets/$id/grab';
   }
 }

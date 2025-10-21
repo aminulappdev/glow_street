@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:glow_street/app/modules/profile/controllers/profile_controller.dart';
 import 'package:glow_street/app/modules/profile/views/change_password_screen.dart';
 import 'package:glow_street/app/modules/profile/views/edit_profile_screen.dart';
 import 'package:glow_street/app/modules/profile/views/info_screen.dart';
@@ -12,7 +13,7 @@ import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProfileScreen extends StatefulWidget { 
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
@@ -20,6 +21,15 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  ProfileDetailsController profileDetailsController =
+      Get.find<ProfileDetailsController>();
+
+  @override
+  void initState() {
+    profileDetailsController.getMyProfile();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,50 +45,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: GoogleFonts.kumbhSans(
                     fontSize: 18, fontWeight: FontWeight.w700),
               )),
-              Card(
-                elevation: 1,
-                color: Colors.white,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Contact info
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundImage: AssetImage(AssetsPath.city),
-                          ),
-                          SizedBox(width: 8.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Md Aminul Islam',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
+              Obx(
+                () {
+                  if (profileDetailsController.inProgress) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return Card(
+                      elevation: 1,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Contact info
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 20.r,
+                                  backgroundImage: AssetImage(AssetsPath.city),
                                 ),
-                              ),
-                              Text(
-                                'aminul@gmail.com',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.grey,
+                                SizedBox(width: 8.w),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      profileDetailsController
+                                              .profileData?.name ??
+                                          '',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      profileDetailsController
+                                              .profileData?.email ??
+                                          '',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                            // Edit and delete icons
+                          ],
+                        ),
                       ),
-                      // Edit and delete icons
-                     
-                    ],
-                  ),
-                ),
+                    );
+                  }
+                },
               ),
               heightBox12,
               Card(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/auth_screen.dart';
 import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/modules/onboarding/views/splash_screen.dart';
+import 'package:glow_street/app_binding.dart';
 
 
 void main() async {
@@ -26,6 +27,7 @@ class GlowStreet extends StatelessWidget {
         return GetMaterialApp( 
           // initialBinding: ControllerBinder(),
           debugShowCheckedModeBanner: false,
+          initialBinding: ControllerBinder(),
           title: 'glow-street',
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
