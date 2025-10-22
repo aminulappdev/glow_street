@@ -15,7 +15,7 @@ class StorageUtil {
   }
 
   static Future<void> deleteData(String key) async {
-    print('Deleting key: $key');
+    print('Deleting key... $key');
     await box.remove(key);
   }
 

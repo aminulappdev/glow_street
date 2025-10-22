@@ -11,7 +11,7 @@ class ResetPasswordController extends GetxController {
   final RxString _errorMessage = ''.obs;
   String get errorMessage => _errorMessage.value;
 
-  /// 🔁 Sign Up Function
+  /// 🔁 Sign Up Function 
   Future<bool> resetPassword({
     String? otpToken,
     String? password,

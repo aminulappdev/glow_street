@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:glow_street/app/modules/community/views/alert_details_screen.dart';
+import 'package:glow_street/app/modules/contact/controllers/all_emergency_contact_controller.dart';
 import 'package:glow_street/app/modules/contact/widgets/add_contact_dialog.dart'
     show AddContactAlertDialog;
+import 'package:glow_street/app/modules/contact/widgets/delete_contact.dart';
 import 'package:glow_street/app/modules/contact/widgets/edit_contact_dialog.dart';
-import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
-import 'package:glow_street/app/widgets/delete_alert_dialog.dart';
 import 'package:glow_street/app/widgets/toggle_button.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 /// A screen to display emergency contacts with a list and notification toggle.
 class ContactScreen extends StatefulWidget {
@@ -20,6 +20,15 @@ class ContactScreen extends StatefulWidget {
 
 class _ContactScreenState extends State<ContactScreen> {
   bool isShowNotification = false;
+
+  AllEmergencyContactController allEmergencyContactController =
+      Get.put(AllEmergencyContactController());
+
+  @override
+  void initState() {
+    allEmergencyContactController.getAllEmergencyContact();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,97 +65,152 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             SizedBox(height: 16.h),
             // Contact list
-            SizedBox(
-              height: 400.h,
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6.h),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                          color: const Color.fromARGB(255, 201, 200, 200),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(12.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Contact info
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 18.r,
-                                  backgroundImage: AssetImage(AssetsPath.city),
-                                ),
-                                SizedBox(width: 8.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Md Aminul Islam',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      '0197545122',
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Edit and delete icons
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(
-                                        () => const AddContactAlertDialog());
-                                  },
-                                  child: Icon(
-                                    Icons.edit,
-                                    size: 20.sp,
-                                    color: const Color(0xff1A5EED),
-                                  ),
-                                ),
-                                SizedBox(width: 8.w),
-                                InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) =>
-                                          const DeleteAlertDialog(),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.delete,
-                                    size: 20.sp,
-                                    color: const Color(0xffDC143C),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+
+            Obx(
+              () {
+                if (allEmergencyContactController.inProgress) {
+                  return SizedBox(
+                    height: 500.h,
+                    child: Center(
+                      child: LoadingAnimationWidget.horizontalRotatingDots(
+                        color: Colors.black,
+                        size: 24,
                       ),
                     ),
                   );
-                },
-              ),
+                } else if (allEmergencyContactController
+                    .emergencyContactData.isEmpty) {
+                  return SizedBox(
+                    height: 500.h,
+                    child: Center(
+                      child: Text("No Emergency Contact Added"),
+                    ),
+                  );
+                } else {
+                  return Expanded(
+                    child: SizedBox(
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: allEmergencyContactController
+                            .emergencyContactData.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 6.h),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.r),
+                                border: Border.all(
+                                  color:
+                                      const Color.fromARGB(255, 201, 200, 200),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(12.w),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Contact info
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 18.r,
+                                          backgroundImage: NetworkImage(
+                                              allEmergencyContactController
+                                                      .emergencyContactData[
+                                                          index]
+                                                      .profile ??
+                                                  ''),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              allEmergencyContactController
+                                                      .emergencyContactData[
+                                                          index]
+                                                      .name ??
+                                                  '',
+                                              style: TextStyle(
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Text(
+                                              allEmergencyContactController
+                                                      .emergencyContactData[
+                                                          index]
+                                                      .phoneNumber ??
+                                                  '',
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w300,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    // Edit and delete icons
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () => showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                EditContactAlertDialog(
+                                              emergencyContactItemModel:
+                                                  allEmergencyContactController
+                                                          .emergencyContactData[
+                                                      index],
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.edit,
+                                            size: 20.sp, 
+                                            color: const Color(0xff1A5EED),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        InkWell(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  DeleteContactAlertDialog(
+                                                emergencyContactItemModel:
+                                                    allEmergencyContactController
+                                                            .emergencyContactData[
+                                                        index],
+                                              ),
+                                            );
+                                          },
+                                          child: Icon(
+                                            Icons.delete,
+                                            size: 20.sp,
+                                            color: const Color(0xffDC143C),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
+
             SizedBox(height: 10.h),
             // Notification toggle and add contact button
             Card(

@@ -28,7 +28,7 @@ class CustomAppBar extends StatelessWidget {
         Text(
           name,
           style: GoogleFonts.poppins(
-            fontSize: 18.sp,
+            fontSize: 17.sp,
             color: Color.fromARGB(255, 0, 0, 0),
             fontWeight: FontWeight.w500,
           ),

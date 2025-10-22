@@ -5,7 +5,7 @@ import 'package:glow_street/services/network_caller/network_caller.dart';
 import 'package:glow_street/services/network_caller/network_response.dart';
 import 'package:glow_street/urls.dart';
 
-class SignInController extends GetxController {
+class DeleteContactController extends GetxController {
   final RxBool _inProgress = false.obs;
   bool get inProgress => _inProgress.value;
 
@@ -13,9 +13,8 @@ class SignInController extends GetxController {
   String get errorMessage => _errorMessage.value;
 
   /// 🔁 Sign Up Function
-  Future<bool> signIn({
-    String? email,
-    String? password,
+  Future<bool> deleteContact({
+    String? id,
   }) async {
     if (_inProgress.value) {
       _errorMessage.value = 'Operation in progress';
@@ -27,28 +26,15 @@ class SignInController extends GetxController {
 
     try {
       // Prepare the body
-      Map<String, dynamic> jsonFields = {
-        "email": email,
-        "password": password,
-      };
 
       final NetworkResponse response =
-          await Get.find<NetworkCaller>().postRequest(
-        Urls.signInUrl,
-        body: jsonFields,
+          await Get.find<NetworkCaller>().deleteRequest(
+        Urls.deleteContactById(id!),
+        accessToken: StorageUtil.getData(StorageUtil.userAccessToken),
       );
 
-      if (response.isSuccess && response.responseData != null) { 
+      if (response.isSuccess && response.responseData != null) {
         _errorMessage.value = '';
-
-        StorageUtil.saveData(
-          StorageUtil.userAccessToken,
-          response.responseData['data']['accessToken'],
-        );
-        StorageUtil.saveData(
-          StorageUtil.userRefreshToken,
-          response.responseData['data']['refreshToken'],
-        );
 
         _inProgress.value = false;
         update();

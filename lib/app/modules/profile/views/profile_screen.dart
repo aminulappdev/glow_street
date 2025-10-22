@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:glow_street/app/modules/profile/controllers/profile_controller.dart';
 import 'package:glow_street/app/modules/profile/views/change_password_screen.dart';
 import 'package:glow_street/app/modules/profile/views/edit_profile_screen.dart';
 import 'package:glow_street/app/modules/profile/views/info_screen.dart';
 import 'package:glow_street/app/modules/profile/views/subscription_screen.dart';
 import 'package:glow_street/app/modules/profile/widgets/logout_alert_dialog.dart';
+import 'package:glow_street/app/modules/profile/widgets/profile_card.dart';
 import 'package:glow_street/app/utils/app_text.dart';
 import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
+import 'package:glow_street/app/widgets/shimmer/profile_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -45,63 +46,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: GoogleFonts.kumbhSans(
                     fontSize: 18, fontWeight: FontWeight.w700),
               )),
-              Obx(
-                () {
-                  if (profileDetailsController.inProgress) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    return Card(
-                      elevation: 1,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Contact info
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 20.r,
-                                  backgroundImage: AssetImage(AssetsPath.city),
-                                ),
-                                SizedBox(width: 8.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      profileDetailsController
-                                              .profileData?.name ??
-                                          '',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      profileDetailsController
-                                              .profileData?.email ??
-                                          '',
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w300,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Edit and delete icons
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
+              Card(
+                elevation: 1,
+                color: Colors.white,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+                  child: Obx(
+                    () {
+                      if (profileDetailsController.inProgress) {
+                        return ProfileShimmerEffectWidget();
+                      } else {
+                        return ProfileCard(
+                          name:
+                              profileDetailsController.profileData?.name ?? '',
+                          email:
+                              profileDetailsController.profileData?.email ?? '',
+                          imagePath:
+                              profileDetailsController.profileData?.profile ??
+                                  '',
+                        );
+                      }
+                    },
+                  ),
+                ),
               ),
               heightBox12,
               Card(
@@ -117,7 +85,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'Edit Profile',
                         subTitle: 'Change profile picture,number,email',
                         ontap: () {
-                          Get.to(EditProfileScreen());
+                          Get.to(EditProfileScreen(
+                            profileData: profileDetailsController.profileData!,
+                          ));
                         },
                       ),
                       profileFeatureRow(
@@ -240,3 +210,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

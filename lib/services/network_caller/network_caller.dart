@@ -24,7 +24,7 @@ class NetworkCaller {
       method: 'GET',
       url: url,
       queryParams: queryParams,
-      headers: headers,
+      headers: headers, 
       accessToken: accessToken,
       token: token,
     );
@@ -205,7 +205,7 @@ class NetworkCaller {
         // Handle multipart request for file uploads
         request.headers.addAll(defaultHeaders);
         if (body != null) {
-          request.fields['payload'] = jsonEncode(body);
+          request.fields['data'] = jsonEncode(body);
         }
 
         // Add single image

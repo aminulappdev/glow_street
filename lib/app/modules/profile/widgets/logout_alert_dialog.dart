@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
+import 'package:glow_street/get_storage.dart';
 
 class LogOutAlertDialog extends StatefulWidget {
   const LogOutAlertDialog({super.key});
@@ -54,7 +58,11 @@ class _LogOutAlertDialogState extends State<LogOutAlertDialog> {
               heightBox20,
               CustomElevatedButton(
                 title: 'Confirm Log Out',
-                onPressed: () {},
+                onPressed: () {
+                  StorageUtil.deleteData(StorageUtil.userAccessToken);
+                  StorageUtil.deleteData(StorageUtil.userRefreshToken);
+                  Get.to(() => const SignInScreen());
+                },
                 isDanger: true,
               ),
               heightBox8,

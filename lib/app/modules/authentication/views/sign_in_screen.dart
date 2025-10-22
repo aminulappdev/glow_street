@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -28,7 +30,7 @@ class _SignInScreenState extends State<SignInScreen> {
   SignInController signInController = SignInController();
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -149,7 +151,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> signInFunction(BuildContext context) async {
     setState(() {
-      _isLoading = true; // Set loading to true when API call starts
+      _isLoading = true;
     });
 
     final bool isSuccess = await signInController.signIn(
@@ -158,7 +160,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
 
     setState(() {
-      _isLoading = false; // Set loading to false when API call ends
+      _isLoading = false;
     });
 
     if (isSuccess) {

@@ -15,6 +15,16 @@ class Urls {
   static const String notificationsUrl = '$_baseUrl/notifications';
   static const String contentUrl = '$_baseUrl/legal';
 
+  // =========================================== Emergency Contact ============================================== //
+  static const String allEmergencyContactUrl = '$_baseUrl/emergency-contacts/my-contact';
+  static const String addEmergencyContactUrl = '$_baseUrl/emergency-contacts';
+  static String editContactById(String id) {
+    return '$_baseUrl/emergency-contacts/$id';
+  }
+   static String deleteContactById(String id) {
+    return '$_baseUrl/emergency-contacts/$id';
+  }
+
   // =========================================== Authentication ====================================== //
   static const String signUpUrl = '$_baseUrl/users';
   static const String refreshTokenUrl = '$_baseUrl/auth/refresh-token';
@@ -28,7 +38,7 @@ class Urls {
       '$_baseUrl/auth/reset-password';
 
   // =========================================== Profile Block ======================================= //
-  static const String updateProfileUrl = '$_baseUrl/teachers/profile';
+  static const String updateProfileUrl = '$_baseUrl/users/update-my-profile';
   static const String updateProfilImageUrl =
       '$_baseUrl/teachers/profile/change-image';
 

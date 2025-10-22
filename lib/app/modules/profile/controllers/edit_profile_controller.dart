@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/get_storage.dart';
@@ -5,7 +7,7 @@ import 'package:glow_street/services/network_caller/network_caller.dart';
 import 'package:glow_street/services/network_caller/network_response.dart';
 import 'package:glow_street/urls.dart';
 
-class SignInController extends GetxController {
+class EditProfileController extends GetxController {
   final RxBool _inProgress = false.obs;
   bool get inProgress => _inProgress.value;
 
@@ -13,9 +15,10 @@ class SignInController extends GetxController {
   String get errorMessage => _errorMessage.value;
 
   /// 🔁 Sign Up Function
-  Future<bool> signIn({
-    String? email,
-    String? password,
+  Future<bool> editProfile({
+    String? name,
+    String? number,
+    File? image,
   }) async {
     if (_inProgress.value) {
       _errorMessage.value = 'Operation in progress';
@@ -25,30 +28,29 @@ class SignInController extends GetxController {
     _inProgress.value = true;
     update();
 
+    print('Image: $image');
+    if (image != null) {
+      print('Image path: ${image.path}');
+      print('Image exists: ${await image.exists()}');
+    } else {
+      print('Image is null');
+    }
+
     try {
       // Prepare the body
-      Map<String, dynamic> jsonFields = {
-        "email": email,
-        "password": password,
-      };
+      Map<String, dynamic> jsonFields = {"name": name, "phoneNumber": number};
 
       final NetworkResponse response =
-          await Get.find<NetworkCaller>().postRequest(
-        Urls.signInUrl,
+          await Get.find<NetworkCaller>().patchRequest(
+        Urls.updateProfileUrl,
         body: jsonFields,
+        accessToken: StorageUtil.getData(StorageUtil.userAccessToken),
+        image: image,
+        keyNameImage: 'profile',
       );
 
-      if (response.isSuccess && response.responseData != null) { 
+      if (response.isSuccess && response.responseData != null) {
         _errorMessage.value = '';
-
-        StorageUtil.saveData(
-          StorageUtil.userAccessToken,
-          response.responseData['data']['accessToken'],
-        );
-        StorageUtil.saveData(
-          StorageUtil.userRefreshToken,
-          response.responseData['data']['refreshToken'],
-        );
 
         _inProgress.value = false;
         update();

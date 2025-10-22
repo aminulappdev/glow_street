@@ -1,16 +1,23 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:glow_street/app/modules/profile/controllers/edit_profile_controller.dart';
+import 'package:glow_street/app/modules/profile/controllers/profile_controller.dart';
+import 'package:glow_street/app/modules/profile/model/profile_details_model.dart';
 import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costom_app_bar.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
-import 'package:glow_street/app/widgets/custom_disable_button.dart';
 import 'package:glow_street/app/widgets/image_picker.dart';
+import 'package:glow_street/app/widgets/show_snackBar_message.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final ProfileData profileData;
+  const EditProfileScreen({super.key, required this.profileData});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -18,11 +25,23 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _alertTypeController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _numberController = TextEditingController();
   final ImagePickerHelper _imagePickerHelper = ImagePickerHelper();
-  File? image;
+  File? image; // Stores the selected image file
+  EditProfileController editProfileController = EditProfileController();
+  ProfileDetailsController profileDetailsController =
+      ProfileDetailsController();
+  bool _isLoading = false;
+  String imagePath = ''; // Stores the network image URL
+
+  @override
+  void initState() {
+    _nameController.text = widget.profileData.name ?? '';
+    _numberController.text = widget.profileData.phoneNumber ?? '';
+    imagePath = widget.profileData.profile ?? '';
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,26 +66,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           CircleAvatar(
                             radius: 38.r,
-                            child: image != null
-                                ? ClipOval(
-                                    child: Image.file(
-                                      image!,
-                                      width: 72.h,
-                                      height: 72.h,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Container(
-                                    height: 72,
-                                    width: 72,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: AssetImage(AssetsPath.city),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  ),
+                            child: ClipOval(
+                              child:
+                                  _buildProfileImage(), // Call a helper method to determine which image to show
+                            ),
                           ),
                           Positioned(
                             bottom: 0,
@@ -77,7 +80,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   File pickedImage,
                                 ) {
                                   setState(() {
-                                    image = pickedImage;
+                                    image =
+                                        pickedImage; // Store the selected image
                                   });
                                 });
                               },
@@ -106,23 +110,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     heightBox4,
                     TextFormField(
-                      controller: _alertTypeController,
+                      controller: _nameController,
                       decoration: const InputDecoration(hintText: 'Enter Name'),
-                    ),
-                    heightBox8,
-                    Text(
-                      'Relation',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: const Color.fromARGB(255, 133, 132, 132),
-                      ),
-                    ),
-                    heightBox4,
-                    TextFormField(
-                      controller: _locationController,
-                      decoration:
-                          const InputDecoration(hintText: 'Enter relation'),
                     ),
                     heightBox8,
                     Text(
@@ -135,12 +124,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     heightBox4,
                     TextFormField(
-                      controller: _descriptionController,
+                      controller: _numberController,
                       decoration: const InputDecoration(hintText: 'Number'),
                     ),
                     heightBox20,
-                    CustomElevatedButton(title: 'Save Changes' , onPressed: () {}),
-                  
+                    CustomElevatedButton(
+                      title: 'Save Changes',
+                      isLoading: _isLoading,
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          editProfile(context);
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -149,5 +145,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
+  }
+
+  // Helper method to determine which image to display
+  Widget _buildProfileImage() {
+    if (image != null) {
+      // Display the locally selected image
+      return Image.file(
+        image!,
+        width: 72.h,
+        height: 72.h,
+        fit: BoxFit.cover,
+      );
+    } else if (imagePath.isNotEmpty) {
+      // Display the network image if available
+      return Image.network(
+        imagePath,
+        width: 72.h,
+        height: 72.h,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to default image if network image fails
+          return Image.asset(
+            AssetsPath.city,
+            width: 72.h,
+            height: 72.h,
+            fit: BoxFit.cover,
+          );
+        },
+      );
+    } else {
+      // Display default image if no image is selected or available
+      return Image.asset(
+        AssetsPath.city,
+        width: 72.h,
+        height: 72.h,
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
+  Future<void> editProfile(BuildContext context) async {
+    setState(() {
+      _isLoading = true; // Set loading to true when API call starts
+    });
+
+    final bool isSuccess = await editProfileController.editProfile(
+      name: _nameController.text.trim(),
+      number: _numberController.text.trim(),
+      image: image, // Pass the selected image file
+    );
+
+    setState(() {
+      _isLoading = false; // Set loading to false when API call ends
+    });
+
+    if (isSuccess) {
+      final ProfileDetailsController profileDetailsController =
+          Get.find<ProfileDetailsController>();
+      await profileDetailsController.getMyProfile();
+      showSnackBarMessage(context, 'Successfully done');
+      Navigator.pop(context);
+    } else {
+      showSnackBarMessage(
+        context,
+        editProfileController.errorMessage,
+        true,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _numberController.dispose();
+    super.dispose();
   }
 }

@@ -8,7 +8,7 @@ class InfoScreen extends StatefulWidget {
   const InfoScreen({super.key, required this.title, required this.content});
 
   @override
-  State<InfoScreen> createState() => _InfoScreenState();
+  State<InfoScreen> createState() => _InfoScreenState(); 
 }
 
 class _InfoScreenState extends State<InfoScreen> {
@@ -17,7 +17,7 @@ class _InfoScreenState extends State<InfoScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Column( 
           children: [
             heightBox30,
             CustomAppBar(name: widget.title),
