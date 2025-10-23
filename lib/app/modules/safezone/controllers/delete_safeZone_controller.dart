@@ -24,6 +24,8 @@ class DeleteSafeZoneController extends GetxController {
     _inProgress.value = true;
     update();
 
+    print(id);
+
     try {
       // Prepare the body
 
