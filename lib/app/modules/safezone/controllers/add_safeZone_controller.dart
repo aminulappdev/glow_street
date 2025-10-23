@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/get_storage.dart';
@@ -5,7 +8,7 @@ import 'package:glow_street/services/network_caller/network_caller.dart';
 import 'package:glow_street/services/network_caller/network_response.dart';
 import 'package:glow_street/urls.dart';
 
-class DeleteContactController extends GetxController {
+class CreateSafeZoneController extends GetxController {
   final RxBool _inProgress = false.obs;
   bool get inProgress => _inProgress.value;
 
@@ -13,9 +16,14 @@ class DeleteContactController extends GetxController {
   String get errorMessage => _errorMessage.value;
 
   /// 🔁 Sign Up Function
-  Future<bool> deleteContact({
-    String? id,
-  }) async {
+  Future<bool> creatSafeZone(
+      {String? description,
+      bool? isContact,
+      double? startLat,
+      double? startLng,
+      double? endLat,
+      double? endLng,
+      String? time}) async {
     if (_inProgress.value) {
       _errorMessage.value = 'Operation in progress';
       return false;
@@ -24,18 +32,39 @@ class DeleteContactController extends GetxController {
     _inProgress.value = true;
     update();
 
+    print(description);
+    print(isContact);
+    print(startLat);
+    print(startLng);
+    print(endLat);
+    print(endLng);
+    print(time);
+
     try {
       // Prepare the body
+      Map<String, dynamic> jsonFields = {
+        "description": description,
+        "expectedReturnTime": time,
+        "notification": isContact,
+        "startLocation": {
+          "type": "Point",
+          "coordinates": [startLng, startLat]
+        },
+        "endLocation": {
+          "type": "Point",
+          "coordinates": [endLng, endLat]
+        }
+      };
 
       final NetworkResponse response =
-          await Get.find<NetworkCaller>().deleteRequest(
-        Urls.deleteSafeZoneById(id!),
+          await Get.find<NetworkCaller>().postRequest(
         accessToken: StorageUtil.getData(StorageUtil.userAccessToken),
+        Urls.createSafeZoneUrl,
+        body: jsonFields,
       );
 
       if (response.isSuccess && response.responseData != null) {
         _errorMessage.value = '';
-
         _inProgress.value = false;
         update();
         return true;

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:glow_street/app/modules/community/views/alert_details_screen.dart';
+import 'package:glow_street/app/modules/community/controllers/all_alert_post_controller.dart';
+import 'package:glow_street/app/modules/community/widgets/alert_post_card.dart';
 import 'package:glow_street/app/modules/community/widgets/post_alert_dialog_widget.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+// NEW: Reusable AlertPostCard Widget
+
+
+// Modified CommunityScreen to use AlertPostCard
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
 
@@ -14,10 +20,35 @@ class CommunityScreen extends StatefulWidget {
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
+  AllAlertPostController allAlertPostController =
+      Get.put(AllAlertPostController());
+
+  @override
+  void initState() {
+    allAlertPostController.getAllAlertPost();
+    super.initState();
+  }
+
+  Future<String> getAddress(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lng, lat);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address = '${place.street ?? ''}, '
+            '${place.administrativeArea ?? ''}, '
+            '${place.country ?? ''}';
+        return address.trim().isEmpty ? 'Unknown Location' : address.trim();
+      }
+    } catch (e) {
+      print('Error getting address: $e');
+    }
+    return 'Unknown Location';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding( 
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -47,133 +78,42 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ),
             ),
             heightBox12,
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Container(
-                      
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey, width: 0.4),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(radius: 18),
-                                    widthBox8,
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Md Aminul Islam',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Md Aminul',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(AlertDetailsScreen());
-                                  },
-                                  child: Container(
-                                    height: 24,
-                                    width: 24,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Color(0xff0501FF),
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            heightBox12,
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.dangerous,
-                                      color: Color(0xffDC2626),
-                                    ),
-                                    Text(
-                                      ' Suspicious Activity',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xffDC2626),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.schedule, color: Colors.grey),
-                                    Text(
-                                      ' 5 min ago',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            heightBox4,
-                            Row(
-                              children: [
-                                Icon(Icons.location_on, color: Colors.grey),
-                                Text(
-                                  'Banasree, Dhaka',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+            Obx(
+              () {
+                if (allAlertPostController.inProgress) {
+                  return SizedBox(
+                    height: 400.h,
+                    child: Center(
+                      child: LoadingAnimationWidget.horizontalRotatingDots(
+                        color: Colors.black,
+                        size: 24,
                       ),
                     ),
                   );
-                },
-              ),
-            ),
+                } else if (allAlertPostController.alertPostData.isEmpty) {
+                  return SizedBox(
+                      height: 400.h,
+                      child: Center(child: Text('No Data Found')));
+                } else {
+                  return Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: allAlertPostController.alertPostData.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: AlertPostCard(
+                            alertPostItem:
+                                allAlertPostController.alertPostData[index],
+                            getAddress: getAddress,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            )
           ],
         ),
       ),

@@ -5,7 +5,7 @@ import 'package:glow_street/services/network_caller/network_caller.dart';
 import 'package:glow_street/services/network_caller/network_response.dart';
 import 'package:glow_street/urls.dart';
 
-class DeleteContactController extends GetxController {
+class DeleteSafeZoneController extends GetxController {
   final RxBool _inProgress = false.obs;
   bool get inProgress => _inProgress.value;
 
@@ -13,7 +13,7 @@ class DeleteContactController extends GetxController {
   String get errorMessage => _errorMessage.value;
 
   /// 🔁 Sign Up Function
-  Future<bool> deleteContact({
+  Future<bool> deleteSafeZone({
     String? id,
   }) async {
     if (_inProgress.value) {

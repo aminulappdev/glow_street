@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:glow_street/app/modules/safezone/controllers/all_safezone_controller.dart';
+import 'package:glow_street/app/modules/safezone/controllers/update_status_controller.dart';
 import 'package:glow_street/app/modules/safezone/widgets/add_safeZone_dialog.dart';
-import 'package:glow_street/app/modules/safezone/widgets/edit_safeZone_dialog.dart';
+import 'package:glow_street/app/modules/safezone/widgets/safeZone_card.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
-import 'package:glow_street/app/widgets/delete_alert_dialog.dart';
+import 'package:glow_street/app/widgets/show_snackBar_message.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SafezoneScreen extends StatefulWidget {
   const SafezoneScreen({super.key});
@@ -13,6 +17,20 @@ class SafezoneScreen extends StatefulWidget {
 }
 
 class _SafezoneScreenState extends State<SafezoneScreen> {
+  AllSafeZoneController allSafeZoneController =
+      Get.put(AllSafeZoneController());
+  final UpdateSafeZoneStatusController updateSafeZoneStatusController =
+      UpdateSafeZoneStatusController();
+
+  // Map to track loading state for each SafeZone item
+  final Map<String, bool> _isLoadingMap = {};
+
+  @override
+  void initState() {
+    allSafeZoneController.getSafeZoneContact();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,169 +76,162 @@ class _SafezoneScreenState extends State<SafezoneScreen> {
               'SafeZones List',
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
-            heightBox12,
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 1,
-                      child: Container(
-                        // height: 130.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'SafeZone:Home',
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Color(0xffDEFFF0),
-                                    ),
-                                    child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Completed',
-                                          style: TextStyle(
-                                            color: Color(0xff12B76A),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.schedule,
-                                    color: Colors.grey,
-                                    size: 16,
-                                  ),
-                                  Text(
-                                    ' Last check-in: 6:00 PM',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              heightBox4,
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.schedule,
-                                    color: Colors.grey,
-                                    size: 16,
-                                  ),
-                                  Text(
-                                    ' Missed check-in: 6:00 PM',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            EditSafeZoneAlertDialog(),
-                                      );
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.edit,
-                                          color: Color(0xff1A5EED),
-                                          size: 16,
-                                        ),
-                                        Text(
-                                          ' Edit',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xff1A5EED),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  widthBox5,
-                                  InkWell(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            DeleteAlertDialog(),
-                                      );
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.delete,
-                                          color: Color(0xffDC143C),
-                                          size: 16,
-                                        ),
-                                        Text(
-                                          ' Remove',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xffDC143C),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+            heightBox4,
+            Obx(
+              () {
+                if (allSafeZoneController.inProgress) {
+                  return SizedBox(
+                    height: 400.h,
+                    child: Center(
+                      child: LoadingAnimationWidget.horizontalRotatingDots(
+                        color: Colors.black,
+                        size: 24,
                       ),
                     ),
                   );
-                },
-              ),
-            ),
+                } else if (allSafeZoneController.safeZoneData.isEmpty) {
+                  return SizedBox(
+                      height: 400.h,
+                      child: Center(child: Text('No Safezone Found')));
+                } else {
+                  return Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: allSafeZoneController.safeZoneData.length,
+                      itemBuilder: (context, index) {
+                        final safeZone =
+                            allSafeZoneController.safeZoneData[index];
+                        final isLoading = _isLoadingMap[safeZone.id] ?? false;
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: SafeZoneCard(
+                            safeZoneItemModel:
+                                allSafeZoneController.safeZoneData[index],
+                            title: '',
+                            status: safeZone.status ?? '',
+                            statusButton: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: allSafeZoneController
+                                            .safeZoneData[index].status ==
+                                        'onGoing'
+                                    ? Colors.green
+                                    : Colors.grey,
+                              ),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0, vertical: 4),
+                                  child: allSafeZoneController
+                                              .safeZoneData[index].status ==
+                                          'onGoing'
+                                      ? GestureDetector(
+                                          onTap: isLoading
+                                              ? null // Disable tap when loading
+                                              : () {
+                                                  updateMarkStatus(
+                                                      safeZone.id!);
+                                                },
+                                          child: Row(
+                                            children: [
+                                              isLoading
+                                                  ? SizedBox(
+                                                      width: 16,
+                                                      height: 16,
+                                                      child: LoadingAnimationWidget
+                                                          .horizontalRotatingDots(
+                                                        color: Colors.white,
+                                                        size: 16,
+                                                      ),
+                                                    )
+                                                  : Icon(
+                                                      Icons.check_box,
+                                                      color: Color.fromARGB(
+                                                          255, 253, 253, 253),
+                                                      size: 16,
+                                                    ),
+                                              widthBox4,
+                                              Text(
+                                                isLoading
+                                                    ? 'Updating...'
+                                                    : 'Mark Safe',
+                                                style: TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 255, 255, 255),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Row(
+                                          children: [
+                                            Icon(
+                                              Icons.check_box,
+                                              color: Color.fromARGB(
+                                                  255, 253, 253, 253),
+                                              size: 16,
+                                            ),
+                                            widthBox4,
+                                            Text(
+                                              'Marked',
+                                              style: TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ),
+                            date: allSafeZoneController
+                                .safeZoneData[index].createdAt!,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> updateMarkStatus(String id) async {
+    setState(() {
+      _isLoadingMap[id] = true; // Set loading state for the specific SafeZone
+    });
+
+    final bool isSuccess =
+        await updateSafeZoneStatusController.updateSafeZoneStatus(
+      id: id,
+      status: 'completed',
+    );
+
+    setState(() {
+      _isLoadingMap[id] = false; // Clear loading state
+    });
+
+    if (isSuccess) {
+      if (mounted) {
+        final AllSafeZoneController allController =
+            Get.find<AllSafeZoneController>();
+        await allController.getSafeZoneContact();
+        // showSnackBarMessage(context, 'Successfully done'); // Optional: Success message
+      }
+    } else {
+      if (mounted) {
+        showSnackBarMessage(
+            context, updateSafeZoneStatusController.errorMessage, true);
+      }
+    }
   }
 }

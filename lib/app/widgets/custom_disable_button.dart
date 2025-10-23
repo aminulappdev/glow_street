@@ -9,7 +9,9 @@ class CustomDisableElevatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.pop(context);
+      },
       child: Container(
         height: 46.h,
         width: double.infinity,

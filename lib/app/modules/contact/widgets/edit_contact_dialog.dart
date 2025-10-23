@@ -1,8 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:glow_street/app/modules/contact/controllers/all_emergency_contact_controller.dart';
 import 'package:glow_street/app/modules/contact/controllers/edit_contact_controller.dart';
 import 'package:glow_street/app/modules/contact/model/emergency_contact_model.dart';
@@ -11,7 +12,7 @@ import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/custom_disable_button.dart';
 import 'package:glow_street/app/widgets/image_picker.dart';
-import 'package:glow_street/app/widgets/show_snackBar_message.dart';
+import 'package:glow_street/app/widgets/show_snackBar_message.dart'; 
 
 class EditContactAlertDialog extends StatefulWidget {
   final EmergencyContactItemModel emergencyContactItemModel;

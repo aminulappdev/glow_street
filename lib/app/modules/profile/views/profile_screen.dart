@@ -112,6 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subTitle: 'Understand the rules and responsibilities',
                         ontap: () {
                           Get.to(InfoScreen(
+                            contentKey: 'termsAndCondition',
                             title: 'Terms and conditions',
                             content: DemoText.policies,
                           ));
@@ -123,6 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subTitle: 'Learn how your data is collected',
                         ontap: () {
                           Get.to(InfoScreen(
+                            contentKey: 'privacyPolicy',
                             title: 'Privacy and Policy',
                             content: DemoText.policies,
                           ));
@@ -210,4 +212,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

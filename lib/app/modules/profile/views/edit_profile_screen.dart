@@ -8,11 +8,11 @@ import 'package:get/get.dart';
 import 'package:glow_street/app/modules/profile/controllers/edit_profile_controller.dart';
 import 'package:glow_street/app/modules/profile/controllers/profile_controller.dart';
 import 'package:glow_street/app/modules/profile/model/profile_details_model.dart';
-import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costom_app_bar.dart';
 import 'package:glow_street/app/widgets/costum_elavated_button.dart';
 import 'package:glow_street/app/widgets/image_picker.dart';
+import 'package:glow_street/app/widgets/image_picker_container.dart';
 import 'package:glow_street/app/widgets/show_snackBar_message.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -64,11 +64,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     Center(
                       child: Stack(
                         children: [
+                          // In your EditProfileScreen's build method, replace the _buildProfileImage() call:
                           CircleAvatar(
                             radius: 38.r,
                             child: ClipOval(
-                              child:
-                                  _buildProfileImage(), // Call a helper method to determine which image to show
+                              child: ProfileImageWidget(
+                                radius: 36.r,
+                                image: image,
+                                imagePath: imagePath,
+                              ),
                             ),
                           ),
                           Positioned(
@@ -148,42 +152,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   // Helper method to determine which image to display
-  Widget _buildProfileImage() {
-    if (image != null) {
-      // Display the locally selected image
-      return Image.file(
-        image!,
-        width: 72.h,
-        height: 72.h,
-        fit: BoxFit.cover,
-      );
-    } else if (imagePath.isNotEmpty) {
-      // Display the network image if available
-      return Image.network(
-        imagePath,
-        width: 72.h,
-        height: 72.h,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          // Fallback to default image if network image fails
-          return Image.asset(
-            AssetsPath.city,
-            width: 72.h,
-            height: 72.h,
-            fit: BoxFit.cover,
-          );
-        },
-      );
-    } else {
-      // Display default image if no image is selected or available
-      return Image.asset(
-        AssetsPath.city,
-        width: 72.h,
-        height: 72.h,
-        fit: BoxFit.cover,
-      );
-    }
-  }
 
   Future<void> editProfile(BuildContext context) async {
     setState(() {
