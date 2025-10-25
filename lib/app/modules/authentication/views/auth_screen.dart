@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_up_screen.dart';
-import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/costum_border_elevated_button.dart';

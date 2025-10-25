@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/auth_screen.dart';
+import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/utils/assets_path.dart';
+import 'package:glow_street/get_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _movetoNewScreen() async {
     await Future.delayed(const Duration(seconds: 3));
-    Get.to(AuthScreen());
+    Get.to(() => StorageUtil.getData(StorageUtil.userAccessToken) != null
+        ? MainButtonNavbarScreen()
+        : AuthScreen());
   }
 
   @override

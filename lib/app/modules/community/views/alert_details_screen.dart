@@ -13,7 +13,7 @@ import 'package:latlong2/latlong.dart';
 // Alert Details Screen
 class AlertDetailsScreen extends StatefulWidget {
   final AlertPostItemModel alertPostItemModel;
-
+ 
   const AlertDetailsScreen({
     super.key,
     required this.alertPostItemModel,

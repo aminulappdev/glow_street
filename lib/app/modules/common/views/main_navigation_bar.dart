@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
 import 'package:glow_street/app/modules/community/views/community_screen.dart';
@@ -7,7 +8,6 @@ import 'package:glow_street/app/modules/home/views/home_screen.dart';
 import 'package:glow_street/app/modules/profile/views/profile_screen.dart';
 import 'package:glow_street/app/modules/safezone/views/safeZone_screen.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
-
 
 class MainButtonNavbarScreen extends StatefulWidget {
   const MainButtonNavbarScreen({super.key});
@@ -18,11 +18,11 @@ class MainButtonNavbarScreen extends StatefulWidget {
 
 class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
   int selectedKey = 0;
+  static const platform = MethodChannel('glow_street/volume');
 
-  // List of screens for navigation
   List<Widget> screens = [
     const HomeScreen(),
-    const SafezoneScreen(), // Replace with other screens as needed
+    const SafezoneScreen(),
     const ContactScreen(),
     const CommunityScreen(),
     const ProfileScreen(),
@@ -31,6 +31,17 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
   @override
   void initState() {
     super.initState();
+    // 🔔 Volume Button listener
+    platform.setMethodCallHandler((call) async {
+      if (call.method == 'volumeBtnPressed') {
+        if (call.arguments == 'volume_up') {
+          print('Hello, I am working');
+          // 🔹 চাইলে এখানে Snackbar, alert, বা function call দিতে পারো
+        } else if (call.arguments == 'volume_down') {
+          print('Volume down pressed');
+        }
+      }
+    });
   }
 
   @override
@@ -58,14 +69,14 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
               _buildNavItem(
                 index: 1,
                 selectedIcon: Icons.share_location,
-                unselectedIcon: Icons.share_location_outlined ,
+                unselectedIcon: Icons.share_location_outlined,
                 label: "Geo",
               ),
               _buildNavItem(
                 index: 2,
                 selectedIcon: Icons.call,
                 unselectedIcon: Icons.call,
-                label: "contact",
+                label: "Contact",
               ),
               _buildNavItem(
                 index: 3,
@@ -73,7 +84,7 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
                 unselectedIcon: Icons.notifications_none_outlined,
                 label: "Alert",
               ),
-               _buildNavItem(
+              _buildNavItem(
                 index: 4,
                 selectedIcon: Icons.person,
                 unselectedIcon: Icons.person_outline,
@@ -107,21 +118,21 @@ class _MainButtonNavbarScreenState extends State<MainButtonNavbarScreen> {
               height: 5.h,
               width: 55.h,
               decoration: BoxDecoration(
-                color: Color(0xff0501FF),
+                color: const Color(0xff0501FF),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            heightBox8,
+          heightBox8,
           Icon(
             isSelected ? selectedIcon : unselectedIcon,
-            color: isSelected ? Color(0xff0501FF) : Colors.black,
+            color: isSelected ? const Color(0xff0501FF) : Colors.black,
             size: 28.sp,
           ),
           if (isSelected)
             Text(
               label,
               style: TextStyle(
-                color: Color(0xff0501FF),
+                color: const Color(0xff0501FF),
                 fontSize: 12.sp,
               ),
             ),

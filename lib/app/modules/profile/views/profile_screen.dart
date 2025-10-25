@@ -5,11 +5,10 @@ import 'package:glow_street/app/modules/profile/controllers/profile_controller.d
 import 'package:glow_street/app/modules/profile/views/change_password_screen.dart';
 import 'package:glow_street/app/modules/profile/views/edit_profile_screen.dart';
 import 'package:glow_street/app/modules/profile/views/info_screen.dart';
-import 'package:glow_street/app/modules/profile/views/subscription_screen.dart';
+import 'package:glow_street/app/modules/subscription/views/subscription_screen.dart';
 import 'package:glow_street/app/modules/profile/widgets/logout_alert_dialog.dart';
 import 'package:glow_street/app/modules/profile/widgets/profile_card.dart';
 import 'package:glow_street/app/utils/app_text.dart';
-import 'package:glow_street/app/utils/assets_path.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
 import 'package:glow_street/app/widgets/shimmer/profile_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,8 +26,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    profileDetailsController.getMyProfile();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      profileDetailsController.getMyProfile();
+    });
   }
 
   @override

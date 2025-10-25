@@ -2,9 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:glow_street/app/modules/contact/controllers/all_emergency_contact_controller.dart';
+import 'package:glow_street/app/modules/profile/controllers/profile_controller.dart';
+import 'package:glow_street/app/widgets/shimmer/home_page_profile_shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:glow_street/app/modules/profile/views/profile_screen.dart'; // Adjust path as needed
 import 'package:glow_street/app/utils/responsive_size.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,12 +23,27 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isSentAlert = false;
   Timer? _holdTimer;
 
+  final AllEmergencyContactController allEmergencyContactController =
+      Get.find<AllEmergencyContactController>();
+  final ProfileDetailsController profileDetailsController =
+      Get.find<ProfileDetailsController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      allEmergencyContactController.getAllEmergencyContact();
+      profileDetailsController.getMyProfile();
+    });
+  }
+
   void _startHoldTimer() {
+    allEmergencyContactController.getAllEmergencyContact();
     setState(() {
       isAnimated = true; // Trigger animation
     });
-    _holdTimer?.cancel(); // Cancel any existing timer
-    _holdTimer = Timer(const Duration(seconds: 2), () {
+    _holdTimer?.cancel(); // Cancel any existing timer 
+    _holdTimer = Timer(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           isSentAlert = true;
@@ -60,24 +80,37 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 heightBox30,
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Hi Eleanor Pena 👋',
-                      style: GoogleFonts.kumbhSans(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(() => const ProfileScreen());
-                      },
-                      child: CircleAvatar(radius: 14.r),
-                    ),
-                  ],
+                Obx(
+                  () {
+                    if (profileDetailsController.inProgress) { 
+                      return HomePageProfileShimmerEffectWidget();
+                    } else {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Hi ${profileDetailsController.profileData?.name} 👋',
+                            style: GoogleFonts.kumbhSans(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(() => const ProfileScreen());
+                            },
+                            child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    profileDetailsController
+                                            .profileData?.profile ??
+                                        ''),
+                                radius: 14.r),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 heightBox30,
                 isSentAlert == false
@@ -132,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: const Color(0xffFFECF0),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.notifications,
@@ -178,67 +212,105 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 heightBox12,
-                SizedBox(
-                  height: 120.h,
-                  width: double.infinity,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.all(6.w),
-                        child: Column(
-                          children: [
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  height: 48.h,
-                                  width: 48.w,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.grey,
-                                    border: isSentAlert
-                                        ? Border.all(
-                                            color: const Color(0xff32CD32),
-                                            width: 2,
-                                          )
-                                        : Border.all(
-                                            width: 0,
-                                            color: Colors.transparent,
-                                          ),
-                                  ),
-                                ),
-                                if (isSentAlert)
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: CircleAvatar(
-                                      radius: 10.r,
-                                      backgroundColor: const Color(0xff32CD32),
-                                      child: const Icon(
-                                        Icons.check,
-                                        size: 10,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            heightBox5,
-                            Text(
-                              'Father',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
+                Obx(
+                  () {
+                    if (allEmergencyContactController.inProgress) {
+                      return SizedBox(
+                        height: 80.h,
+                        child: Center(
+                          child: LoadingAnimationWidget.horizontalRotatingDots(
+                            color: Colors.black,
+                            size: 24,
+                          ),
                         ),
                       );
-                    },
-                  ),
+                    } else if (allEmergencyContactController
+                        .emergencyContactData.isEmpty) {
+                      return Text(
+                        'No Emergency Contacts',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      );
+                    } else {
+                      return SizedBox(
+                        height: 120.h,
+                        width: double.infinity,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: allEmergencyContactController
+                              .emergencyContactData.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.all(6.w),
+                              child: Column(
+                                children: [
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Container(
+                                        height: 48.h,
+                                        width: 48.w,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  allEmergencyContactController
+                                                          .emergencyContactData[
+                                                              index]
+                                                          .profile ??
+                                                      ''),
+                                              fit: BoxFit.cover),
+                                          shape: BoxShape.circle,
+                                          color: Colors.grey,
+                                          border: isSentAlert
+                                              ? Border.all(
+                                                  color:
+                                                      const Color(0xff32CD32),
+                                                  width: 2,
+                                                )
+                                              : Border.all(
+                                                  width: 0,
+                                                  color: Colors.transparent,
+                                                ),
+                                        ),
+                                      ),
+                                      if (isSentAlert)
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: CircleAvatar(
+                                            radius: 10.r,
+                                            backgroundColor:
+                                                const Color(0xff32CD32),
+                                            child: const Icon(
+                                              Icons.check,
+                                              size: 10,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  heightBox5,
+                                  Text(
+                                    allEmergencyContactController
+                                            .emergencyContactData[index].name ??
+                                        '',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
                 ),
                 heightBox12,
                 GestureDetector(

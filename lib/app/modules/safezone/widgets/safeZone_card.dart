@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:glow_street/app/modules/safezone/model/safeZone_model.dart';
 import 'package:glow_street/app/modules/safezone/widgets/edit_safeZone_dialog.dart';
 import 'package:glow_street/app/utils/responsive_size.dart';
@@ -20,8 +21,27 @@ class SafeZoneCard extends StatelessWidget {
     required this.safeZoneItemModel,
   });
 
+  Future<String> getAddress(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lng, lat);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address = '${place.street ?? ''}, '
+            '${place.administrativeArea ?? ''}, '
+            '${place.country ?? ''}';
+        return address.trim().isEmpty ? 'Unknown Location' : address.trim();
+      }
+    } catch (e) {
+      print('Error getting address: $e');
+    }
+    return 'Unknown Location';
+  }
+
   @override
   Widget build(BuildContext context) {
+    var lat = safeZoneItemModel.endLocation?.coordinates[0] ?? 0.0;
+    var lng = safeZoneItemModel.endLocation?.coordinates[1] ?? 0.0;
+
     return Card(
       color: Colors.white,
       elevation: 1,
@@ -42,12 +62,35 @@ class SafeZoneCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'SafeZone: $title',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  FutureBuilder<String>(
+                    future: getAddress(lat, lng),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return SizedBox(
+                          width: 200.w,
+                          child: Text(
+                            'Loading location...',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        child: Text(
+                          'SafeZone: ${snapshot.data ?? 'Unknown Location'}',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    },
                   ),
                   Container(
                     decoration: BoxDecoration(

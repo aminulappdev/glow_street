@@ -32,7 +32,7 @@ class NetworkCaller {
 
   // POST request
   Future<NetworkResponse> postRequest(
-    String url, {
+    String url,  {
     Map<String, dynamic>? queryParams,
     Map<String, String>? headers,
     Map<String, dynamic>? body,

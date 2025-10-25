@@ -24,13 +24,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _isLoading = false; // Add loading state
 
-  TextEditingController emailController = TextEditingController(text: 'aminulappdev@gmail.com');
-  TextEditingController passwordController = TextEditingController(text: 'Aminul@123');
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   SignInController signInController = SignInController();
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -79,7 +79,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             }
                             return null;
                           },
-                          decoration: InputDecoration(hintText: 'Email Address'),
+                          decoration:
+                              InputDecoration(hintText: 'Email Address'),
                         ),
                         heightBox12,
                         TextFormField(
@@ -164,7 +165,7 @@ class _SignInScreenState extends State<SignInScreen> {
     });
 
     if (isSuccess) {
-      showSnackBarMessage(context, 'Successfully done');
+      // showSnackBarMessage(context, 'Successfully done');
       Get.offAll(() => MainButtonNavbarScreen());
     } else {
       showSnackBarMessage(

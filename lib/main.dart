@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:glow_street/app/modules/authentication/views/auth_screen.dart';
-import 'package:glow_street/app/modules/common/views/main_navigation_bar.dart';
 import 'package:glow_street/app/modules/onboarding/views/splash_screen.dart';
 import 'package:glow_street/app_binding.dart';
 
+const platform = MethodChannel('glow_street/volume'); // ✅ Channel name (must match Kotlin side)
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await GetStorage.init();
-  // await Firebase.initializeApp();
+
+  // 🔔 Native থেকে আসা কল হ্যান্ডেল করা
+  platform.setMethodCallHandler((call) async {
+    if (call.method == 'volumeBtnPressed') {
+      if (call.arguments == 'volume_up') {
+        print('Hello, I am working');
+      } else if (call.arguments == 'volume_down') {
+        print('Volume down pressed');
+      }
+    }
+  });
+
   runApp(const GlowStreet());
 }
 
@@ -24,20 +34,18 @@ class GlowStreet extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return GetMaterialApp( 
-          // initialBinding: ControllerBinder(),
+        return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           initialBinding: ControllerBinder(),
           title: 'glow-street',
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
-            // ignore: deprecated_member_use
             inputDecorationTheme: inputDecoration(),
             useMaterial3: true,
             fontFamily: 'Poppins',
-            textTheme: TextTheme(),
+            textTheme: const TextTheme(),
           ),
-          home: SplashScreen(),
+          home: const SplashScreen(),
         );
       },
     );
@@ -47,7 +55,6 @@ class GlowStreet extends StatelessWidget {
 InputDecorationTheme inputDecoration() {
   return InputDecorationTheme(
     hintStyle: const TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
-
     fillColor: Colors.transparent,
     filled: true,
     border: inputBorder(),
@@ -60,7 +67,7 @@ InputDecorationTheme inputDecoration() {
 
 OutlineInputBorder inputBorder() {
   return OutlineInputBorder(
-    borderSide: BorderSide(color: const Color(0xffCACACA), width: 1),
+    borderSide: const BorderSide(color: Color(0xffCACACA), width: 1),
     borderRadius: BorderRadius.circular(10),
   );
 }

@@ -43,7 +43,9 @@ class CreateAlertPostController extends GetxController {
       final NetworkResponse response =
           await Get.find<NetworkCaller>().postRequest(
         accessToken: StorageUtil.getData(StorageUtil.userAccessToken),
+        
         Urls.addCommunityAlertUrl,
+        
         body: jsonFields,
         images: images, // Pass the image explicitly
         keyNameImage: 'images', // Ensure this matches the server key

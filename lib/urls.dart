@@ -64,4 +64,22 @@ class Urls {
   static String deleteNotificationById(String id) {
     return '$_baseUrl/notifications/$id';
   }
+
+
+  // =========================================== Community Alert ============================================== //
+  static const String allPackageUrl = '$_baseUrl/packages';
+  static const String paymentCheckoutUrl = '$_baseUrl/packages';
+  static const String subscriptionUrl = '$_baseUrl/subscription';
+  static const String paymentsUrl = '$_baseUrl/payments';
+
+
+
+  static String confirmedPaymentUrlsById(String id) {
+    return '$_baseUrl/notifications/$id';
+  }
+ 
+
+
+
 }
+

@@ -11,7 +11,9 @@ class CustomArrowWidget extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.all(8.0),
-          child: GestureDetector(onTap: () {}, child: Icon(Icons.arrow_back)),
+          child: GestureDetector(onTap: () {
+            Navigator.pop(context);
+          }, child: Icon(Icons.arrow_back)),
         ),
 
         Container(height: 0.5.h, color: Colors.grey),

@@ -1,60 +1,40 @@
 import 'package:get/get.dart';
 import 'package:glow_street/app/modules/authentication/views/sign_in_screen.dart';
+import 'package:glow_street/app/modules/subscription/model/all_package_model.dart';
 import 'package:glow_street/get_storage.dart';
 import 'package:glow_street/services/network_caller/network_caller.dart';
 import 'package:glow_street/services/network_caller/network_response.dart';
 import 'package:glow_street/urls.dart';
 
-class SignInController extends GetxController {
+class AllPackageController extends GetxController {
   final RxBool _inProgress = false.obs;
   bool get inProgress => _inProgress.value;
 
   final RxString _errorMessage = ''.obs;
   String get errorMessage => _errorMessage.value;
 
-  /// 🔁 Sign Up Function
-  Future<bool> signIn({
-    String? email,
-    String? password,
-  }) async {
-    if (_inProgress.value) {
-      _errorMessage.value = 'Operation in progress';
-      return false;
-    }
+  final Rx<AllPackageModel?> _allPackageModel = Rx<AllPackageModel?>(null);
+  List<AllPackageItemModel> get allPackageData =>
+      _allPackageModel.value?.data?.data ?? [];
 
+  @override
+  void onInit() {
+    super.onInit();
+  }
+
+  Future<bool> getAllPackage() async {
     _inProgress.value = true;
     update();
 
     try {
-      // Prepare the body
-      Map<String, dynamic> jsonFields = {
-        "email": email,
-        "password": password,
-      };
-
-      final NetworkResponse response =
-          await Get.find<NetworkCaller>().postRequest(
-        Urls.signInUrl,
-        body: jsonFields,
-      );
+      final NetworkResponse response = await Get.find<NetworkCaller>()
+          .getRequest(Urls.allPackageUrl,
+              accessToken: StorageUtil.getData(StorageUtil.userAccessToken));
 
       if (response.isSuccess && response.responseData != null) {
         _errorMessage.value = '';
-
-        StorageUtil.saveData(
-          StorageUtil.userId,
-          response.responseData['data']['_id'],
-        );
-
-        StorageUtil.saveData(
-          StorageUtil.userAccessToken,
-          response.responseData['data']['accessToken'],
-        );
-        StorageUtil.saveData(
-          StorageUtil.userRefreshToken,
-          response.responseData['data']['refreshToken'],
-        );
-
+        _allPackageModel.value =
+            AllPackageModel.fromJson(response.responseData);
         _inProgress.value = false;
         update();
         return true;
@@ -66,7 +46,8 @@ class SignInController extends GetxController {
         return false;
       }
     } catch (e) {
-      _errorMessage.value = 'Error signing up: $e';
+      _errorMessage.value = 'Failed to fetch district data: ${e.toString()}';
+      print('Error fetching district data: $e');
       _inProgress.value = false;
       update();
       return false;
